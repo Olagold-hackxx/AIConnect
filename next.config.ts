@@ -1,9 +1,8 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-   experimental: {
-    optimizeCss: false,
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    optimizeCss: false, // disable LightningCSS to avoid missing binary errors
   },
 }
 
-export default nextConfig;
+export default nextConfig
