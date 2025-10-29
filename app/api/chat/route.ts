@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { AICONNECT_KNOWLEDGE_BASE } from '@/lib/knowledge-base'
+import { CODIAN_KNOWLEDGE_BASE } from '@/lib/knowledge-base'
 
 export const maxDuration = 30
 
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     // Create the system prompt with knowledge base
     const systemPrompt = `You are AIConnect's AI assistant - a knowledgeable, friendly, and professional guide that helps visitors understand our AI-as-a-Service platform.
 
-${AICONNECT_KNOWLEDGE_BASE}
+${CODIAN_KNOWLEDGE_BASE}
 
 Instructions:
 - Always be helpful, accurate, and professional
