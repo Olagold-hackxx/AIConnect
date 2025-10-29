@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles } from "lucide-react"
 import { Suspense, useState, useEffect } from "react"
+import Link from "next/link"
 import { Canvas } from "@react-three/fiber"
 import { Scene } from "@/components/3d/ai-robot"
 import { OrbitControls, Environment, PerspectiveCamera } from "@react-three/drei"
@@ -84,8 +85,10 @@ export function Hero3D() {
               Get Started
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
-            <Button size="lg" variant="outline" className="backdrop-blur-sm bg-transparent">
-              See Plans
+            <Button size="lg" variant="outline" className="backdrop-blur-sm bg-transparent" asChild>
+              <Link href="/pricing">
+                See Plans
+              </Link>
             </Button>
           </div>
 
