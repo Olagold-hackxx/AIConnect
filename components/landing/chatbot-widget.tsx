@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { X, Send, MessageCircle, Sparkles, Bot, User, Loader2 } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
 import Markdown from 'react-markdown'
+import { useChatbot } from "@/components/chatbot-context"
 
 interface Message {
   id: string
@@ -13,7 +13,7 @@ interface Message {
 }
 
 export function ChatbotWidget() {
-  const [isOpen, setIsOpen] = useState(false)
+  const { isOpen, closeChatbot, openChatbot } = useChatbot()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -23,7 +23,7 @@ export function ChatbotWidget() {
     {
       id: 'welcome',
       role: 'assistant' as const,
-      content: "👋 Hi! I'm AIConnect's AI assistant. I can help you learn about our AI-as-a-Service platform, our AI personas, pricing, and how to get started. What would you like to know?"
+      content: "👋 Hi! I'm CODIAN's AI assistant. I can help you learn about our AI-as-a-Service platform, our AI personas, pricing, and how to get started. What would you like to know?"
     }
   ] : messages
 
@@ -101,7 +101,7 @@ export function ChatbotWidget() {
     <>
       {/* Floating Chat Button */}
       {!isOpen && (
-        <button onClick={() => setIsOpen(true)} className=" fixed bottom-6 right-6 z-50 group" aria-label="Open chat">
+        <button onClick={openChatbot} className="fixed bottom-6 right-6 z-50 group" aria-label="Open chat">
           <div className="relative">
             {/* Animated gradient ring */}
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-ai-primary via-ai-secondary to-ai-accent animate-spin-slow blur-md opacity-75" />
@@ -130,7 +130,7 @@ export function ChatbotWidget() {
               </div>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={closeChatbot}
               className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors"
               aria-label="Close chat"
             >
@@ -157,13 +157,11 @@ export function ChatbotWidget() {
                       <User className="h-4 w-4 mt-0.5 flex-shrink-0" />
                     )}
                     <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                      <Markdown>{message.parts?.map((part: any, index: number) => {
-                        switch (part.type) {
-                          case 'text':
-                            return <span key={index}>{part.text}</span>
-                          default:
-                            return <span key={index}>{part.text || part.content}</span>
+                      <Markdown>{message.parts?.map((part: any, partIndex: number) => {
+                        if (part.type === 'text') {
+                          return <span key={`text-${partIndex}`}>{part.text}</span>
                         }
+                        return <span key={`content-${partIndex}`}>{part.text || part.content}</span>
                       }) || message.content}</Markdown> 
                     </div>
                   </div>

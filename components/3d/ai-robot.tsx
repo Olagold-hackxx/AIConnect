@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles } from "lucide-react"
 import * as THREE from "three"
 
-function AIRobot() {
+export function AIRobot() {
   const groupRef = useRef<THREE.Group>(null)
   const headRef = useRef<THREE.Mesh>(null)
   const leftArmRef = useRef<THREE.Group>(null)   // ✅ Group, not Mesh

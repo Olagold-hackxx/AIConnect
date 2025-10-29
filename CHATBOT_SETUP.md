@@ -85,3 +85,4 @@ Modify the component styles in `components/landing/chatbot-widget.tsx`.
 
 The chatbot should provide detailed, accurate responses based on the knowledge base.
 
+
