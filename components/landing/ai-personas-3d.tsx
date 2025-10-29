@@ -4,24 +4,24 @@ import Link from "next/link"
 
 const personas = [
   {
-    name: "Digital Marketer",
-    role: "AI Assistant",
+    role: "Digital Marketer",
+    name: "Rita",
     description: "Social media management, campaign strategy, ad creation, and performance reporting",
     image: "/retro-pop-art-illustration-of-professional-woman-d.jpg",
     bgGradient: "from-orange-400 via-yellow-400 to-orange-500",
     textColor: "text-orange-900",
   },
   {
-    name: "Executive Assistant",
-    role: "AI Assistant",
+    role: "Executive Assistant",
+    name: "Jane",
     description: "Scheduling, task management, communication, document prep, and research",
     image: "/retro-pop-art-illustration-of-professional-woman-e.jpg",
     bgGradient: "from-orange-400 via-pink-400 to-orange-500",
     textColor: "text-orange-900",
   },
   {
-    name: "Customer Support",
-    role: "AI Assistant",
+    role: "Customer Support",
+    name: "Isabel",
     description: "Client inquiries, live chat, ticket management, and support automation",
     image: "/retro-pop-art-illustration-of-professional-woman-c.jpg",
     bgGradient: "from-pink-500 via-fuchsia-500 to-pink-600",
@@ -76,13 +76,13 @@ export function AIPersonas3D() {
 
                 {/* Role Badge */}
                 <div className="absolute bottom-4 left-4 rounded-full bg-white px-4 py-2 shadow-lg">
-                  <p className={`text-sm font-bold ${persona.textColor}`}>{persona.role}</p>
+                  <p className={`text-sm font-bold ${persona.textColor}`}>{persona.name}</p>
                 </div>
               </div>
 
               {/* Content */}
               <div className="p-6">
-                <h3 className="mb-3 text-2xl font-bold">{persona.name}</h3>
+                <h3 className="mb-3 text-2xl font-bold">{persona.role}</h3>
                 <p className="text-pretty text-muted-foreground">{persona.description}</p>
 
                 {/* Hover Indicator */}

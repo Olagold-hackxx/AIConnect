@@ -1,7 +1,16 @@
 import { PageLayout } from "@/components/shared/page-layout"
 import { PageHeader } from "@/components/shared/page-header"
 import { AIPersonas3D } from "@/components/landing/ai-personas-3d"
-import { CheckCircle2 } from "lucide-react"
+import { 
+  User, 
+  Settings, 
+  Zap, 
+  Brain, 
+  Monitor, 
+  RefreshCw, 
+  HeadphonesIcon,
+  CheckCircle2
+} from "lucide-react"
 
 export default function ServicesPage() {
   return (
@@ -24,8 +33,16 @@ export default function ServicesPage() {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {/* Personal Account Manager - Centered in last row */}
+            <div className="rounded-xl border border-border/40 bg-card p-6 ">
+              <User className="mb-4 h-8 w-8 text-primary" />
+              <h3 className="mb-2 text-xl font-semibold">Personal Account Manager</h3>
+              <p className="text-sm text-muted-foreground">
+                Your dedicated account manager handles everything from initial consultation to ongoing management, optimization, and strategic guidance.
+              </p>
+            </div> 
             <div className="rounded-xl border border-border/40 bg-card p-6">
-              <CheckCircle2 className="mb-4 h-8 w-8 text-primary" />
+              <Settings className="mb-4 h-8 w-8 text-primary" />
               <h3 className="mb-2 text-xl font-semibold">Custom Configuration</h3>
               <p className="text-sm text-muted-foreground">
                 We tailor each AI assistant to your specific business needs, workflows, and brand voice.
@@ -33,7 +50,7 @@ export default function ServicesPage() {
             </div>
 
             <div className="rounded-xl border border-border/40 bg-card p-6">
-              <CheckCircle2 className="mb-4 h-8 w-8 text-secondary" />
+              <Zap className="mb-4 h-8 w-8 text-secondary" />
               <h3 className="mb-2 text-xl font-semibold">Seamless Integration</h3>
               <p className="text-sm text-muted-foreground">
                 Our team handles all technical integration with your existing tools and platforms.
@@ -41,7 +58,7 @@ export default function ServicesPage() {
             </div>
 
             <div className="rounded-xl border border-border/40 bg-card p-6">
-              <CheckCircle2 className="mb-4 h-8 w-8 text-accent" />
+              <Brain className="mb-4 h-8 w-8 text-accent" />
               <h3 className="mb-2 text-xl font-semibold">Training & Optimization</h3>
               <p className="text-sm text-muted-foreground">
                 Continuous training on your data to improve accuracy and performance over time.
@@ -49,7 +66,7 @@ export default function ServicesPage() {
             </div>
 
             <div className="rounded-xl border border-border/40 bg-card p-6">
-              <CheckCircle2 className="mb-4 h-8 w-8 text-primary" />
+              <Monitor className="mb-4 h-8 w-8 text-primary" />
               <h3 className="mb-2 text-xl font-semibold">24/7 Monitoring</h3>
               <p className="text-sm text-muted-foreground">
                 Round-the-clock monitoring to ensure optimal performance and quick issue resolution.
@@ -57,20 +74,22 @@ export default function ServicesPage() {
             </div>
 
             <div className="rounded-xl border border-border/40 bg-card p-6">
-              <CheckCircle2 className="mb-4 h-8 w-8 text-secondary" />
+              <RefreshCw className="mb-4 h-8 w-8 text-secondary" />
               <h3 className="mb-2 text-xl font-semibold">Regular Updates</h3>
               <p className="text-sm text-muted-foreground">
                 Automatic updates with the latest AI models and features at no extra cost.
               </p>
             </div>
 
-            <div className="rounded-xl border border-border/40 bg-card p-6">
-              <CheckCircle2 className="mb-4 h-8 w-8 text-accent" />
+            <div className="rounded-xl border border-border/40 bg-card p-6 md:col-start-1 md:col-end-3 lg:col-start-2 lg:col-end-3">
+              <HeadphonesIcon className="mb-4 h-8 w-8 text-accent" />
               <h3 className="mb-2 text-xl font-semibold">Dedicated Support</h3>
               <p className="text-sm text-muted-foreground">
                 Direct access to our AI specialists for questions, adjustments, and strategic guidance.
               </p>
             </div>
+
+          
           </div>
         </div>
       </div>

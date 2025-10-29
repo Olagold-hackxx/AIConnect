@@ -117,16 +117,16 @@ export function ChatbotWidget() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-[380px] h-[600px] flex flex-col bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-ai-primary/20 border border-ai-primary/20 overflow-hidden">
+        <div className="fixed bottom-6 right-6 z-50 w-[380px] h-[600px] flex flex-col bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-ai-primary/20 border border-ai-primary/20 overflow-hidden">
           {/* Header */}
           <div className="relative flex items-center justify-between p-4 bg-gradient-to-r from-ai-primary via-ai-secondary to-ai-accent">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-gray" />
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray">AI Assistant</h3>
-                <p className="text-xs text-gray/80">Always here to help</p>
+                <h3 className="font-semibold text-white">AI Assistant</h3>
+                <p className="text-xs text-white/80">Always here to help</p>
               </div>
             </div>
             <button
@@ -134,7 +134,7 @@ export function ChatbotWidget() {
               className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors"
               aria-label="Close chat"
             >
-              <X className="w-4 h-4 text-gray" />
+              <X className="w-4 h-4 text-white" />
             </button>
           </div>
 
@@ -145,8 +145,8 @@ export function ChatbotWidget() {
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
                     message.role === "user"
-                      ? "bg-gradient-to-br from-ai-primary border border-teal-400 to-ai-secondary text-gray-800"
-                      : "bg-gradient-to-br from-teal-50 to-cyan-50 text-gray-800 border border-ai-primary/10"
+                      ? "bg-gradient-to-br from-ai-primary border border-teal-400 to-ai-secondary text-white"
+                      : "bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 text-gray-800 dark:text-gray-100 border border-ai-primary/10 dark:border-gray-600"
                   }`}
                 >
                   <div className="flex items-start space-x-2">
@@ -171,7 +171,7 @@ export function ChatbotWidget() {
             
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gradient-to-br from-teal-50 to-cyan-50 text-gray-800 border border-ai-primary/10 rounded-2xl px-4 py-2.5 max-w-[80%]">
+                <div className="bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700 text-gray-800 dark:text-gray-100 border border-ai-primary/10 dark:border-gray-600 rounded-2xl px-4 py-2.5 max-w-[80%]">
                   <div className="flex items-center space-x-2">
                     <Bot className="h-4 w-4" />
                     <div className="flex items-center space-x-1">
@@ -185,16 +185,16 @@ export function ChatbotWidget() {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t border-ai-primary/10 bg-gradient-to-br from-teal-50/50 to-cyan-50/50">
+          <div className="p-4 border-t border-ai-primary/10 dark:border-gray-600 bg-gradient-to-br from-teal-50/50 to-cyan-50/50 dark:from-gray-800/50 dark:to-gray-700/50">
             <form onSubmit={handleSubmit} className="flex items-end gap-2">
               <div className="flex-1 relative">
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder="Ask me anything about AIConnect..."
+                  placeholder="Ask me anything about CODIAN..."
                   rows={1}
-                  className="w-full px-4 py-3 pr-12 rounded-xl border border-ai-primary/20 bg-white/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-ai-primary/50 resize-none text-sm"
+                  className="w-full px-4 py-3 pr-12 rounded-xl border border-ai-primary/20 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-ai-primary/50 resize-none text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   disabled={isLoading}
                 />
               </div>

@@ -3,6 +3,97 @@
 import { Button } from "@/components/ui/button"
 import { MessageCircle, Phone } from "lucide-react"
 import { useChatbot } from "@/components/chatbot-context"
+import { useEffect, useState } from "react"
+
+// Professional account manager images
+const accountManagers = [
+ 
+  {
+    id: 1,
+    name: "Marcus Johnson",
+    role: "Lead Account Manager", 
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+    specialty: "Enterprise Solutions"
+  },
+  {
+    id: 2,
+    name: "Emily Rodriguez",
+    role: "Account Manager",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
+    specialty: "Startup Growth"
+  },
+  {
+    id: 3,
+    name: "David Kim",
+    role: "Senior Account Manager",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    specialty: "Technical Implementation"
+  },
+  {
+    id: 4,
+    name: "Lisa Thompson",
+    role: "Account Manager",
+    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face",
+    specialty: "Customer Success"
+  },
+  {
+    id: 5,
+    name: "James Wilson",
+    role: "Lead Account Manager",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    specialty: "Strategic Planning"
+  }
+]
+
+function AccountManagerCarousel() {
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % accountManagers.length)
+    }, 3000) // Change every 3 seconds
+
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="relative w-full h-80 overflow-hidden rounded-2xl">
+      <div 
+        className="flex transition-transform duration-500 ease-in-out h-full"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {accountManagers.map((manager) => (
+          <div key={manager.id} className="w-full flex-shrink-0 relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+            <img
+              src={manager.image}
+              alt={manager.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+              <h3 className="text-xl font-semibold text-white">{manager.name}</h3>
+              <p className="text-sm text-white/80">{manager.role}</p>
+              <p className="text-xs text-white/60 mt-1">{manager.specialty}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Dots indicator */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+        {accountManagers.map((_, index) => (
+          <button
+            key={index}
+            className={`w-2 h-2 rounded-full transition-colors ${
+              index === currentIndex ? 'bg-white' : 'bg-white/50'
+            }`}
+            onClick={() => setCurrentIndex(index)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export function AgentCTA() {
   const { openChatbot } = useChatbot()
@@ -36,16 +127,10 @@ export function AgentCTA() {
             </div>
 
             <div className="relative">
-              <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/20 to-accent/20">
-                <div className="flex h-full items-center justify-center">
-                  <div className="text-center">
-                    <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-primary via-accent to-secondary">
-                      <span className="text-4xl">👨‍💼</span>
-                    </div>
-                    <p className="text-lg font-semibold">Your Dedicated Account Manager</p>
-                    <p className="mt-2 text-sm text-muted-foreground">Expert support every step of the way</p>
-                  </div>
-                </div>
+              <AccountManagerCarousel />
+              <div className="mt-4 text-center">
+                <p className="text-lg font-semibold">Your Dedicated Account Managers</p>
+                <p className="mt-2 text-sm text-muted-foreground">Expert support every step of the way</p>
               </div>
             </div>
           </div>
