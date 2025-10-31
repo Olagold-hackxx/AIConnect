@@ -10,52 +10,52 @@ const accountManagers = [
   {
     id: 1,
     name: "Marcus Johnson",
-    role: "Lead Account Manager", 
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face",
-    specialty: "Enterprise Solutions"
+    role: "Lead Account Manager",
+    image: "/account-manager-marcus.jpg",
+    specialty: "Enterprise Solutions",
   },
   {
     id: 2,
     name: "Amara Williams",
     role: "Senior Account Manager",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face",
-    specialty: "Customer Success"
+    image: "/account-manager-amara.jpg",
+    specialty: "Customer Success",
   },
   {
     id: 3,
     name: "Jabari Mitchell",
     role: "Account Manager",
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=face",
-    specialty: "Technical Implementation"
+    image: "/account-manager-jabari.jpg",
+    specialty: "Technical Implementation",
   },
   {
     id: 4,
-    name: "Sarah Chen",
-    role: "Account Manager",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
-    specialty: "Startup Growth"
+    name: "Keisha Anderson",
+    role: "Senior Account Manager",
+    image: "/account-manager-keisha.jpg",
+    specialty: "Enterprise Solutions",
   },
   {
     id: 5,
     name: "David Okafor",
     role: "Lead Account Manager",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
-    specialty: "Strategic Planning"
+    image: "/account-manager-david.jpg",
+    specialty: "Strategic Planning",
   },
   {
     id: 6,
-    name: "Zara Osei",
-    role: "Senior Account Manager",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=face",
-    specialty: "Enterprise Solutions"
+    name: "Sarah Chen",
+    role: "Account Manager",
+    image: "/account-manager-sarah.jpg",
+    specialty: "Startup Growth",
   },
   {
     id: 7,
     name: "Michael Thompson",
     role: "Account Manager",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
-    specialty: "Customer Success"
-  }
+    image: "/account-manager-michael.jpg",
+    specialty: "Customer Success",
+  },
 ]
 
 function AccountManagerCarousel() {
@@ -70,18 +70,18 @@ function AccountManagerCarousel() {
   }, [])
 
   return (
-    <div className="relative w-full h-80 overflow-hidden rounded-2xl">
+    <div className="relative w-full h-80 overflow-hidden rounded-2xl bg-muted">
       <div 
         className="flex transition-transform duration-500 ease-in-out h-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {accountManagers.map((manager) => (
-          <div key={manager.id} className="w-full flex-shrink-0 relative">
+          <div key={manager.id} className="w-full flex-shrink-0 relative flex items-center justify-center">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
             <img
               src={manager.image}
               alt={manager.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain object-center"
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
               <h3 className="text-xl font-semibold text-white">{manager.name}</h3>
