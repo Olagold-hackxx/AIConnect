@@ -5,43 +5,56 @@ import { MessageCircle, Phone } from "lucide-react"
 import { useChatbot } from "@/components/chatbot-context"
 import { useEffect, useState } from "react"
 
-// Professional account manager images
+// Professional account manager images - predominantly Black with diverse representation
 const accountManagers = [
- 
   {
     id: 1,
     name: "Marcus Johnson",
     role: "Lead Account Manager", 
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face",
     specialty: "Enterprise Solutions"
   },
   {
     id: 2,
-    name: "Emily Rodriguez",
-    role: "Account Manager",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
-    specialty: "Startup Growth"
+    name: "Amara Williams",
+    role: "Senior Account Manager",
+    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face",
+    specialty: "Customer Success"
   },
   {
     id: 3,
-    name: "David Kim",
-    role: "Senior Account Manager",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    name: "Jabari Mitchell",
+    role: "Account Manager",
+    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=face",
     specialty: "Technical Implementation"
   },
   {
     id: 4,
-    name: "Lisa Thompson",
+    name: "Sarah Chen",
     role: "Account Manager",
-    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face",
-    specialty: "Customer Success"
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
+    specialty: "Startup Growth"
   },
   {
     id: 5,
-    name: "James Wilson",
+    name: "David Okafor",
     role: "Lead Account Manager",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
     specialty: "Strategic Planning"
+  },
+  {
+    id: 6,
+    name: "Zara Osei",
+    role: "Senior Account Manager",
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=face",
+    specialty: "Enterprise Solutions"
+  },
+  {
+    id: 7,
+    name: "Michael Thompson",
+    role: "Account Manager",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
+    specialty: "Customer Success"
   }
 ]
 
@@ -81,13 +94,13 @@ function AccountManagerCarousel() {
       
       {/* Dots indicator */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        {accountManagers.map((_, index) => (
+        {accountManagers.map((manager, idx) => (
           <button
-            key={index}
+            key={manager.id}
             className={`w-2 h-2 rounded-full transition-colors ${
-              index === currentIndex ? 'bg-white' : 'bg-white/50'
+              idx === currentIndex ? 'bg-white' : 'bg-white/50'
             }`}
-            onClick={() => setCurrentIndex(index)}
+            onClick={() => setCurrentIndex(idx)}
           />
         ))}
       </div>
@@ -104,10 +117,9 @@ export function AgentCTA() {
         <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 p-8 sm:p-12 lg:p-16">
           <div className="relative z-10 grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
-              <h2 className="mb-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl">Ready to Get Started?</h2>
+              <h2 className="mb-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl">Ready to Get Started with Human-Enabled AI?</h2>
               <p className="mb-8 text-pretty text-lg text-muted-foreground">
-                Talk to one of our AI specialists to learn how CODIAN can transform your business operations. We'll
-                handle everything from setup to ongoing management.
+                Talk to one of our AI automation specialists and dedicated human managers to learn how CODIAN's AI agents powered by human support can transform your business operations. We'll handle everything from setup to ongoing management with expert human guidance.
               </p>
 
               <div className="flex flex-col gap-4 sm:flex-row">

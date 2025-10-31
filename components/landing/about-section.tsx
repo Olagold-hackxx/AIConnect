@@ -6,15 +6,13 @@ export function AboutSection() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mb-6 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-balance">
-            Complete Setup, Expert Guidance
+            Human-Enabled AI Automation: Complete Setup with Expert Human Support
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed text-pretty">
-            CODIAN handles all the technical heavy lifting — setup, integration, and deployment. Then, your dedicated
-            account manager helps you leverage the AI effectively for your specific business needs.
+            CODIAN delivers AI agents powered by human expertise. We handle all technical setup, integration, and deployment, while your dedicated human manager ensures your AI assistants execute tasks effectively and deliver real business results.
           </p>
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed text-pretty">
-            No technical expertise required. No configuration headaches. Just powerful AI working for your business with
-            expert guidance every step of the way.
+            Our AI automation combines intelligent AI personas with experienced human support. No technical expertise required. No configuration headaches. Just powerful, human-enabled AI assistants working for your business with expert guidance every step of the way.
           </p>
         </div>
 
@@ -36,10 +34,9 @@ export function AboutSection() {
                 />
               </svg>
             </div>
-            <h3 className="mb-3 text-xl font-semibold">Complete Setup</h3>
+            <h3 className="mb-3 text-xl font-semibold">Human-Powered AI Setup</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Our team handles all technical setup, integration with your systems, and deployment. You don't touch any
-              code or configuration.
+              Our expert team handles all technical setup, integration with your systems, and deployment of your AI automation. You don't touch any code or configuration — we do it all.
             </p>
           </div>
 
@@ -54,10 +51,9 @@ export function AboutSection() {
                 />
               </svg>
             </div>
-            <h3 className="mb-3 text-xl font-semibold">Expert Guidance</h3>
+            <h3 className="mb-3 text-xl font-semibold">Dedicated Human Manager</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Your dedicated account manager helps you maximize AI value for your business — from strategy to
-              optimization to ongoing support.
+              Your dedicated human manager helps you maximize value from your AI agents. Our human-enabled approach ensures your AI assistants execute tasks effectively with expert human oversight from strategy to optimization.
             </p>
           </div>
 
@@ -67,10 +63,9 @@ export function AboutSection() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
-            <h3 className="mb-3 text-xl font-semibold">Business Growth</h3>
+            <h3 className="mb-3 text-xl font-semibold">AI Automation That Delivers</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Focus on growing your business while AI handles repetitive work. Scale operations without expanding your
-              team.
+              Focus on growing your business while our AI personas and human support handle repetitive work. Scale operations without expanding your team — our human-enabled AI automation delivers real results.
             </p>
           </div>
         </div>

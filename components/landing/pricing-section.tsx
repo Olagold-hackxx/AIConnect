@@ -1,19 +1,20 @@
 import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
+import Link from "next/link"
 
 const plans = [
   {
     name: "Starter Plan",
     price: "$500",
     period: "one-time setup",
-    recurring: "$49/month",
-    description: "Perfect for small businesses starting with AI automation",
+    recurring: null,
+    description: "Perfect for businesses starting with AI automation",
     features: [
-      "Customer Support AI Assistant integration",
+      "All 3 AI Assistants",
+      "Uptime guarantee",
       "Basic setup and configuration",
       "Email support",
-      "Option to continue for $49/month",
-      "Ongoing management included",
+      "No ongoing support included",
     ],
     cta: "Get Started",
     popular: false,
@@ -23,13 +24,13 @@ const plans = [
     price: "$600",
     period: "per month",
     recurring: null,
-    description: "Ideal for growing businesses needing multiple AI assistants",
+    description: "Ideal for businesses needing AI automation with human manager support",
     features: [
-      "Any two AI Assistants",
-      "Personal Account Manager",
+      "All 3 AI Assistants",
+      "Uptime guarantee",
+      "Human manager with great support",
       "Priority support",
       "Custom integration setup",
-      "Option to recruit manager internally",
       "Advanced analytics",
     ],
     cta: "Get Started",
@@ -40,13 +41,14 @@ const plans = [
     price: "$1000",
     period: "per month",
     recurring: null,
-    description: "Complete AI automation for established businesses",
+    description: "Complete AI automation with fully dedicated human manager",
     features: [
-      "All three AI Assistants",
-      "Dedicated Account Manager",
+      "All 3 AI Assistants",
+      "Uptime guarantee",
+      "Fully dedicated human manager",
+      "Option to hire your manager",
       "24/7 premium support",
       "Full custom integration",
-      "Option to recruit manager internally",
       "Advanced analytics & reporting",
       "Custom AI training on your data",
     ],
@@ -67,7 +69,7 @@ export function PricingSection() {
             </span>
           </h2>
           <p className="mx-auto max-w-2xl text-pretty text-lg text-muted-foreground">
-            Choose the plan that fits your business needs. All plans include full management and support.
+            Choose the plan that fits your business needs. All plans include AI automation with uptime guarantee. Professional and Enterprise plans include human manager support.
           </p>
         </div>
 
@@ -104,8 +106,8 @@ export function PricingSection() {
                 )}
               </div>
 
-              <Button className={`mb-6 w-full ${plan.popular ? "ai-gradient" : ""}`} size="lg">
-                {plan.cta}
+              <Button className={`mb-6 w-full ${plan.popular ? "ai-gradient" : ""}`} size="lg" asChild>
+                <Link href="/signup">{plan.cta}</Link>
               </Button>
 
               <ul className="space-y-3">

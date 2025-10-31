@@ -16,8 +16,8 @@ export default function ServicesPage() {
   return (
     <PageLayout>
       <PageHeader
-        title="Our AI Services"
-        description="Specialized AI assistants managed and deployed by our expert team."
+        title="Our Human-Enabled AI Automation Services"
+        description="AI agents powered by human support - specialized AI assistants managed and deployed by our expert human managers."
       />
 
       <div className="py-16">
@@ -26,9 +26,10 @@ export default function ServicesPage() {
         {/* Service Details */}
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-20">
           <div className="mb-16 text-center">
-            <h2 className="mb-4 text-3xl font-bold">What's Included</h2>
+            <h2 className="mb-4 text-3xl font-bold">What's Included with Human-Enabled AI Automation</h2>
             <p className="text-lg text-muted-foreground">
-              Every AI assistant comes with comprehensive setup and ongoing management.
+              Every AI assistant comes with comprehensive setup, ongoing management, and dedicated human support. 
+              Our AI agents powered by human expertise ensure your tasks are executed effectively.
             </p>
           </div>
 
@@ -36,9 +37,11 @@ export default function ServicesPage() {
             {/* Personal Account Manager - Centered in last row */}
             <div className="rounded-xl border border-border/40 bg-card p-6 ">
               <User className="mb-4 h-8 w-8 text-primary" />
-              <h3 className="mb-2 text-xl font-semibold">Personal Account Manager</h3>
+              <h3 className="mb-2 text-xl font-semibold">Dedicated Human Manager</h3>
               <p className="text-sm text-muted-foreground">
-                Your dedicated account manager handles everything from initial consultation to ongoing management, optimization, and strategic guidance.
+                Your dedicated human manager ensures your AI assistants execute tasks effectively. They handle everything from 
+                initial consultation to ongoing management, optimization, and strategic guidance. This human-enabled approach 
+                guarantees quality and alignment with your business goals.
               </p>
             </div> 
             <div className="rounded-xl border border-border/40 bg-card p-6">
@@ -83,9 +86,10 @@ export default function ServicesPage() {
 
             <div className="rounded-xl border border-border/40 bg-card p-6 md:col-start-1 md:col-end-3 lg:col-start-2 lg:col-end-3">
               <HeadphonesIcon className="mb-4 h-8 w-8 text-accent" />
-              <h3 className="mb-2 text-xl font-semibold">Dedicated Support</h3>
+              <h3 className="mb-2 text-xl font-semibold">Human-Enabled Support</h3>
               <p className="text-sm text-muted-foreground">
-                Direct access to our AI specialists for questions, adjustments, and strategic guidance.
+                Direct access to our AI automation specialists and human managers for questions, adjustments, and strategic 
+                guidance. Our human-enabled AI assistants come with expert human support to ensure optimal performance.
               </p>
             </div>
 

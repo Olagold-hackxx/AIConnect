@@ -6,7 +6,6 @@ import { Suspense, useState, useEffect } from "react"
 import Link from "next/link"
 import { Canvas } from "@react-three/fiber"
 import { Scene } from "@/components/3d/ai-robot"
-import { OrbitControls, Environment, PerspectiveCamera } from "@react-three/drei"
 
 export function Hero3D() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -19,8 +18,8 @@ export function Hero3D() {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
 
-    window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
+    globalThis.addEventListener("mousemove", handleMouseMove)
+    return () => globalThis.removeEventListener("mousemove", handleMouseMove)
   }, [])
 
   return (
@@ -65,25 +64,27 @@ export function Hero3D() {
         <div className="flex min-h-screen flex-col items-center justify-center text-center">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-medium text-primary backdrop-blur-sm">
             <Sparkles className="h-4 w-4" />
-            <span>AI Consultant & Manager Service</span>
+            <span>Human-Enabled AI Assistant & Automation Service</span>
           </div>
 
           <h1 className="mb-6 max-w-4xl text-balance text-5xl font-bold leading-tight tracking-tight sm:text-6xl lg:text-7xl">
-          Empower Your Business with Fully Managed{" "}
+          Empower Your Business with{" "}
             <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-            AI Assistants
+            AI Agents Powered by Human
             </span>
+            {" "}Support
           </h1>
 
           <p className="mb-10 max-w-2xl text-pretty text-lg text-muted-foreground sm:text-xl">
-            CODIAN sets up and manages AI assistants that handle your marketing, support, and admin — while you focus on
-            growth.
+            CODIAN provides human-enabled AI automation with dedicated managers who execute your tasks effectively. Our AI personas work alongside experienced human support to transform your business operations.
           </p>
 
           <div className="flex flex-col items-center gap-4 sm:flex-row">
-            <Button size="lg" className="ai-gradient group">
-              Get Started
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <Button size="lg" className="ai-gradient group" asChild>
+              <Link href="/signup">
+                Get Started
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
             </Button>
             <Button size="lg" variant="outline" className="backdrop-blur-sm bg-transparent" asChild>
               <Link href="/pricing">
@@ -95,15 +96,15 @@ export function Hero3D() {
           <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-              <span>Fully Managed Service</span>
+              <span>Human-Enabled AI Automation</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
-              <span>Personal Account Manager</span>
+              <span>Dedicated Human Manager</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 animate-pulse rounded-full bg-purple-500" />
-              <span>No Setup Required</span>
+              <span>AI Personas with Human Support</span>
             </div>
           </div>
         </div>

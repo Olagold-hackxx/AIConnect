@@ -35,14 +35,26 @@ export function Navigation() {
               Pricing
             </Link>
             <Link
+              href="/about"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              About
+            </Link>
+            <Link
+              href="/blog"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Blog
+            </Link>
+            <Link
               href="/contact"
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               Contact
             </Link>
             <ThemeToggle />
-            <Button size="sm" className="ai-gradient">
-              Get Started
+            <Button size="sm" className="ai-gradient" asChild>
+              <Link href="/signup">Get Started</Link>
             </Button>
           </div>
 
@@ -74,14 +86,28 @@ export function Navigation() {
                 Pricing
               </Link>
               <Link
+                href="/about"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                onClick={() => setIsOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="/blog"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                onClick={() => setIsOpen(false)}
+              >
+                Blog
+              </Link>
+              <Link
                 href="/contact"
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 onClick={() => setIsOpen(false)}
               >
                 Contact
               </Link>
-              <Button size="sm" className="ai-gradient">
-                Get Started
+              <Button size="sm" className="ai-gradient" asChild>
+                <Link href="/signup">Get Started</Link>
               </Button>
             </div>
           </div>
