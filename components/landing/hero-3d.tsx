@@ -45,8 +45,8 @@ export function Hero3D() {
       </div>
 
    {/* 3D Background */}
-   <div className="absolute inset-0 top-1/3 left-1/2 right-12  z-10 ">
-        <div className="relative h-[200px] w-full">
+   <div className="absolute inset-0 top-1/3 sm:top-1/3 left-1/2 right-4 sm:right-12 z-10">
+        <div className="relative h-[150px] sm:h-[200px] w-full">
             <Canvas
               shadows
               className="rounded-2xl "
@@ -62,12 +62,13 @@ export function Hero3D() {
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 z-30">
         <div className="flex min-h-screen flex-col items-center justify-center text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-medium text-primary backdrop-blur-sm">
-            <Sparkles className="h-4 w-4" />
-            <span>Human-Enabled AI Assistant & Automation Service</span>
+          <div className="mb-4 sm:mb-6 inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-primary/20 bg-primary/10 px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-primary backdrop-blur-sm">
+            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Human-Enabled AI Assistant & Automation Service</span>
+            <span className="sm:hidden">AI + Human Support</span>
           </div>
 
-          <h1 className="mb-6 max-w-4xl text-balance text-5xl font-bold leading-tight tracking-tight sm:text-6xl lg:text-7xl">
+          <h1 className="mb-4 sm:mb-6 max-w-4xl text-balance text-3xl sm:text-5xl font-bold leading-tight tracking-tight lg:text-6xl xl:text-7xl">
           Empower Your Business with{" "}
             <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
             AI Agents Powered by Human
@@ -75,36 +76,38 @@ export function Hero3D() {
             {" "}Support
           </h1>
 
-          <p className="mb-10 max-w-2xl text-pretty text-lg text-muted-foreground sm:text-xl">
+          <p className="mb-8 sm:mb-10 max-w-2xl text-pretty text-base sm:text-lg text-muted-foreground lg:text-xl px-2">
             CODIAN provides human-enabled AI automation with dedicated managers who execute your tasks effectively. Our AI personas work alongside experienced human support to transform your business operations.
           </p>
 
-          <div className="flex flex-col items-center gap-4 sm:flex-row">
-            <Button size="lg" className="ai-gradient group" asChild>
+          <div className="flex flex-col items-center gap-3 sm:gap-4 w-full sm:w-auto px-4 sm:px-0">
+            <Button size="lg" className="ai-gradient group w-full sm:w-auto" asChild>
               <Link href="/signup">
                 Get Started
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="backdrop-blur-sm bg-transparent" asChild>
+            <Button size="lg" variant="outline" className="backdrop-blur-sm bg-transparent w-full sm:w-auto" asChild>
               <Link href="/pricing">
                 See Plans
               </Link>
             </Button>
           </div>
 
-          <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-              <span>Human-Enabled AI Automation</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
-              <span>Dedicated Human Manager</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 animate-pulse rounded-full bg-purple-500" />
-              <span>AI Personas with Human Support</span>
+          <div className="mt-12 sm:mt-16 w-full max-w-md sm:max-w-none">
+            <div className="grid grid-cols-1 gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-8 text-xs sm:text-sm text-muted-foreground px-4">
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-green-500 flex-shrink-0" />
+                <span className="text-center">Human-Enabled AI Automation</span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500 flex-shrink-0" />
+                <span className="text-center">Dedicated Human Manager</span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-purple-500 flex-shrink-0" />
+                <span className="text-center">AI Personas with Human Support</span>
+              </div>
             </div>
           </div>
         </div>
