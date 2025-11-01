@@ -44,7 +44,7 @@ const accountManagers = [
   },
   {
     id: 6,
-    name: "Sarah Chen",
+    name: "Sarah Olaniyi",
     role: "Account Manager",
     image: "/account-manager-sarah.jpg",
     specialty: "Startup Growth",
