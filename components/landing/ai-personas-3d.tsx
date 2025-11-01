@@ -21,7 +21,7 @@ const personas = [
   },
   {
     role: "Customer Support",
-    name: "Isabel",
+    name: "David",
     description: "Client inquiries, live chat, ticket management, and support automation",
     image: "/ai-assistant-customer-support.jpg",
     bgGradient: "from-pink-500 via-fuchsia-500 to-pink-600",
