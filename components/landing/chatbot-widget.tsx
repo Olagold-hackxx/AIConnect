@@ -101,7 +101,7 @@ export function ChatbotWidget() {
     <>
       {/* Floating Chat Button */}
       {!isOpen && (
-        <button onClick={openChatbot} className="fixed bottom-6 right-6 z-50 group" aria-label="Open chat">
+        <button onClick={openChatbot} className="fixed bottom-6 right-6 left-6 sm:left-auto z-50 group flex justify-center sm:justify-end" aria-label="Open chat">
           <div className="relative">
             {/* Animated gradient ring */}
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-ai-primary via-ai-secondary to-ai-accent animate-spin-slow blur-md opacity-75" />
@@ -117,7 +117,7 @@ export function ChatbotWidget() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-[380px] h-[600px] flex flex-col bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-ai-primary/20 border border-ai-primary/20 overflow-hidden">
+        <div className="fixed bottom-6 right-6 left-6 sm:left-auto sm:w-[380px] h-[600px] z-50 flex flex-col bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-ai-primary/20 border border-ai-primary/20 overflow-hidden">
           {/* Header */}
           <div className="relative flex items-center justify-between p-4 bg-gradient-to-r from-ai-primary via-ai-secondary to-ai-accent">
             <div className="flex items-center gap-3">

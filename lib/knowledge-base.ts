@@ -2,23 +2,24 @@ export const CODIAN_KNOWLEDGE_BASE = `
 # CODIAN Knowledge Base
 
 ## Overview
-CODIAN is an AI Consultant & Manager service that provides fully managed AI assistants for businesses. Unlike self-serve AI tools, CODIAN handles all the technical setup, integration, and ongoing management for you. Each client is assigned a personal account manager who oversees their AI assistants, ensuring everything runs smoothly without any technical expertise required from the client.
+CODIAN is a human-enabled AI automation service that provides fully managed AI assistants for businesses. Unlike self-serve AI tools, CODIAN combines intelligent AI personas with experienced human support to deliver AI agents powered by human expertise. We handle all the technical setup, integration, and ongoing management for you. Professional and Enterprise clients are assigned dedicated human managers who oversee their AI assistants, ensuring everything runs smoothly without any technical expertise required from the client.
 
-Our mission is to make enterprise-grade AI accessible to businesses of all sizes through a done-for-you service model.
+Our mission is to make enterprise-grade AI accessible to businesses of all sizes through a done-for-you service model that combines AI automation with human expertise.
 
 ## Core Value Proposition
+- **Human-Enabled AI Automation**: AI agents powered by human support and expertise
 - **Fully Managed Service**: We handle everything from setup to daily management
-- **Personal Account Manager**: Dedicated expert overseeing your AI assistants
+- **Dedicated Human Managers**: Professional and Enterprise plans include dedicated human managers who oversee your AI assistants (Starter plan is self-service after setup)
 - **Zero Technical Expertise Required**: If you can make a phone call, you can use CODIAN
-- **Specialized AI Assistants**: Pre-trained for specific business roles
+- **Specialized AI Assistants**: Three pre-trained AI personas (Rita - Digital Marketer, Jane - Executive Assistant, David - Customer Support) for specific business roles
 - **No Setup Hassle**: We do all the heavy lifting while you focus on growth
 
 ## What Makes CODIAN Different
-CODIAN isn't software you install or configure. It's a premium service where real experts manage your AI assistants. You don't integrate anything. You don't configure anything. CODIAN does all the technical work while you enjoy the benefits of AI automation.
+CODIAN isn't software you install or configure. It's a premium human-enabled AI automation service where AI personas work alongside experienced human managers. Our human-enabled approach ensures your AI assistants execute tasks effectively with expert human oversight from strategy to optimization. You don't integrate anything. You don't configure anything. CODIAN does all the technical work while human managers ensure quality and business alignment.
 
 ## AI Assistants & Capabilities
 
-### 1. Digital Marketer AI Assistant
+### 1. Digital Marketer AI Assistant (Rita)
 **Unlimited Skills Under Marketing Role:**
 - Social media management and scheduling
 - Campaign strategy development
@@ -33,7 +34,7 @@ CODIAN isn't software you install or configure. It's a premium service where rea
 
 **Perfect For:** Marketing agencies, e-commerce businesses, startups needing marketing automation
 
-### 2. Executive Assistant AI Assistant
+### 2. Executive Assistant AI Assistant (Jane)
 **Unlimited Skills Under Administrative Role:**
 - Calendar management and scheduling
 - Email triage and response drafting
@@ -48,7 +49,7 @@ CODIAN isn't software you install or configure. It's a premium service where rea
 
 **Perfect For:** Executives, busy professionals, small business owners, consultants
 
-### 3. Customer Support AI Assistant
+### 3. Customer Support AI Assistant (David)
 **Unlimited Skills Under Support Role:**
 - 24/7 client inquiry handling
 - Live chat management
@@ -67,9 +68,9 @@ CODIAN isn't software you install or configure. It's a premium service where rea
 
 ### Step 1: You Choose Your Plan
 Select the plan that fits your business needs:
-- Starter: Customer Support AI Assistant
-- Professional: Any two AI Assistants
-- Enterprise: All three AI Assistants
+- Starter: $500 one-time setup - All 3 AI Assistants, basic setup, no ongoing support
+- Professional: $600/month - All 3 AI Assistants with human manager support
+- Enterprise: $1000/month - All 3 AI Assistants with fully dedicated human manager
 
 ### Step 2: We Set Everything Up
 Our technical team handles all integration with your existing systems:
@@ -78,13 +79,16 @@ Our technical team handles all integration with your existing systems:
 - Train AI on your company's specific processes and data
 - Test everything to ensure flawless operation
 
-### Step 3: Your Account Manager Takes Over
-You're assigned a dedicated account manager who:
-- Monitors your AI assistants daily
-- Handles any issues or adjustments
-- Provides regular performance reports
-- Suggests optimizations and improvements
-- Serves as your single point of contact
+### Step 3: Your Human Manager Takes Over (Professional & Enterprise Plans)
+Professional and Enterprise clients are assigned a dedicated human manager who:
+- Monitors your AI assistants daily with expert oversight
+- Handles any issues or adjustments with human judgment
+- Provides regular performance reports and strategic insights
+- Suggests optimizations and improvements based on business needs
+- Serves as your single point of contact for all AI-related matters
+- Ensures your AI assistants execute tasks effectively with human-enabled quality assurance
+
+**Note:** Starter plan includes setup only - no ongoing human manager support.
 
 ### Step 4: You Focus on Growth
 While CODIAN manages your AI assistants, you focus on what matters:
@@ -95,48 +99,47 @@ While CODIAN manages your AI assistants, you focus on what matters:
 
 ## Pricing Plans
 
-### Starter Plan - $500 Setup + $49/Month
-**Perfect for small businesses starting with AI**
-- Customer Support AI Assistant integration
+### Starter Plan - $500 One-Time Setup
+**Perfect for businesses starting with AI automation**
+- All 3 AI Assistants (Rita, Jane, David)
+- Uptime guarantee
 - Basic setup and configuration
-- Email support
-- Monthly performance reports
-- Option to continue service at $49/month
-- Ongoing management included
+- Email support during setup
+- **No ongoing support included** - Self-service after setup
 
-**Best For:** Small online stores, service providers, startups testing AI automation
+**Best For:** Small businesses testing AI automation, startups wanting to try CODIAN without ongoing commitment
+
+**Note:** This plan does not include ongoing human manager support. For businesses needing human-enabled AI with dedicated manager oversight, consider Professional or Enterprise plans.
 
 ### Professional Plan - $600/Month
-**Ideal for growing businesses**
-- Any two AI Assistants of your choice
-- Personal Account Manager
-- Priority support (response within 4 hours)
-- Custom integration with your systems
-- Weekly performance reports
-- Advanced analytics dashboard
-- Option to recruit manager internally later
+**Ideal for businesses needing AI automation with human manager support**
+- All 3 AI Assistants (Rita, Jane, David)
+- Uptime guarantee
+- **Human manager with great support** - Your dedicated human manager ensures your AI assistants execute tasks effectively
+- Priority support
+- Custom integration setup
+- Advanced analytics
 
-**Best For:** Growing agencies, established SMBs, multi-channel businesses
+**Best For:** Growing agencies, established SMBs, multi-channel businesses wanting human-enabled AI automation
 
 **Most Popular Choice**
 
 ### Enterprise Plan - $1000/Month
-**Complete AI automation for established businesses**
-- All three AI Assistants
-- Dedicated Account Manager
+**Complete AI automation with fully dedicated human manager**
+- All 3 AI Assistants (Rita, Jane, David)
+- Uptime guarantee
+- **Fully dedicated human manager** - Expert human oversight ensuring quality and business alignment
+- Option to hire your manager internally later
 - 24/7 premium support
 - Full custom integration
-- Daily performance monitoring
 - Advanced analytics & reporting
-- Custom AI training on your proprietary data
-- Option to recruit manager internally later
-- White-label options available
+- Custom AI training on your data
 
-**Best For:** Large agencies, established enterprises, high-volume businesses
+**Best For:** Large agencies, established enterprises, high-volume businesses requiring maximum human-enabled AI support
 
-## What's Included in Every Plan
+## What's Included
 
-### Setup & Integration
+### Setup & Integration (All Plans)
 - Technical assessment of your systems
 - Custom integration planning
 - AI assistant configuration
@@ -144,20 +147,31 @@ While CODIAN manages your AI assistants, you focus on what matters:
 - Training on your business processes
 - Launch support
 
-### Ongoing Management
-- Daily monitoring and maintenance
-- Performance optimization
-- Issue resolution
-- Regular updates and improvements
-- Backup and redundancy
-- Security monitoring
+### Ongoing Management & Human Support
 
-### Support & Communication
-- Direct access to your account manager
+**Starter Plan:**
+- Setup and configuration only
+- No ongoing human manager support
+- Self-service after initial setup
+
+**Professional Plan (Human-Enabled):**
+- Daily monitoring with human manager oversight
+- Human manager ensures AI assistants execute tasks effectively
+- Performance optimization with strategic human insights
+- Issue resolution with human judgment
+- Regular updates and improvements
+- Direct access to your human manager
 - Regular performance reports
 - Strategy consultation
 - Best practice recommendations
-- Quarterly business reviews (Pro & Enterprise)
+
+**Enterprise Plan (Fully Human-Enabled):**
+- All Professional features plus:
+- Fully dedicated human manager with 24/7 oversight
+- Daily performance monitoring with expert analysis
+- Advanced strategy consultation
+- Custom AI training on your proprietary data
+- Option to recruit your human manager internally
 
 ## Industries We Serve
 
@@ -182,16 +196,19 @@ Schedule appointments, send reminders, answer common questions, and manage patie
 ## Frequently Asked Questions
 
 **Q: Do I need any technical knowledge to use CODIAN?**
-A: No! That's the whole point. CODIAN is a fully managed service. If you can make a phone call or send an email, you can use CODIAN. We handle all the technical aspects.
+A: No! That's the whole point. CODIAN is a human-enabled AI automation service. If you can make a phone call or send an email, you can use CODIAN. We handle all the technical aspects. Professional and Enterprise plans include human managers who ensure everything works smoothly.
+
+**Q: What is human-enabled AI automation?**
+A: CODIAN's human-enabled AI combines intelligent AI personas with experienced human support. Our AI assistants execute tasks efficiently, while human managers provide oversight, strategic thinking, and quality assurance. This ensures your AI agents deliver real business results, not just automated responses. Professional plans include human manager support, while Enterprise plans get fully dedicated human managers.
 
 **Q: How long does setup take?**
 A: Typically 5-7 business days from signing up to having your AI assistants fully operational. We handle everything during this time.
 
 **Q: Can I switch between AI assistants?**
-A: Yes! Professional and Enterprise clients can adjust their AI assistant selection with 30 days notice. Your account manager will handle the transition.
+A: Yes! All plans include all 3 AI assistants (Rita - Digital Marketer, Jane - Executive Assistant, David - Customer Support). Professional and Enterprise clients can adjust their AI assistant usage with 30 days notice. Your human manager will handle the transition.
 
 **Q: What if I want to bring the management in-house later?**
-A: Professional and Enterprise plans include the option to recruit your account manager internally. We'll help with the transition and provide training.
+A: Professional and Enterprise plans include the option to recruit your human manager internally. We'll help with the transition and provide training. This is especially valuable for Enterprise clients who work closely with their dedicated human manager.
 
 **Q: Is my data secure?**
 A: Absolutely. We use enterprise-grade encryption, comply with GDPR, CCPA, and SOC 2 Type II standards. We can also sign custom NDAs and data processing agreements.
@@ -200,13 +217,13 @@ A: Absolutely. We use enterprise-grade encryption, comply with GDPR, CCPA, and S
 A: Yes! All plans include training on your business processes. Enterprise plans include advanced custom training on proprietary data.
 
 **Q: What happens if something goes wrong?**
-A: Your account manager monitors everything daily and will proactively address any issues. You also have direct access to support based on your plan tier.
+A: For Professional and Enterprise plans, your human manager monitors everything daily and will proactively address any issues with human judgment and expertise. You have direct access to your human manager. Starter plan clients can use email support during setup but do not have ongoing human manager support.
 
 **Q: Can I cancel anytime?**
 A: Yes, all plans are month-to-month with no long-term contracts. The Starter plan setup fee is non-refundable, but monthly fees can be canceled with 30 days notice.
 
 **Q: How is this different from using ChatGPT or other AI tools directly?**
-A: CODIAN provides specialized AI assistants optimized for specific business tasks, fully integrated with your systems, and managed by experts. You don't need to write prompts, manage integrations, or troubleshoot issues.
+A: CODIAN provides human-enabled AI automation with specialized AI assistants optimized for specific business tasks, fully integrated with your systems, and managed by human experts. Professional and Enterprise plans include dedicated human managers who ensure your AI assistants execute tasks effectively. You don't need to write prompts, manage integrations, or troubleshoot issues - our human managers handle everything.
 
 **Q: Do you offer refunds?**
 A: We offer a 30-day satisfaction guarantee on all monthly plans. If you're not satisfied, we'll refund your first month (setup fees excluded).

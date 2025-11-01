@@ -28,32 +28,32 @@ export async function POST(req: Request) {
     }
 
     // Get the latest user message
-    const lastMessage = messages[messages.length - 1]
-    if (!lastMessage || lastMessage.role !== 'user') {
+    const lastMessage = messages.at(-1)
+    if (!lastMessage?.role || lastMessage.role !== 'user') {
       return Response.json({ 
         error: 'No user message found' 
       }, { status: 400 })
     }
 
     // Create the system prompt with knowledge base
-    const systemPrompt = `You are AIConnect's AI assistant - a knowledgeable, friendly, and professional guide that helps visitors understand our AI-as-a-Service platform.
+    const systemPrompt = `You are CODIAN's AI assistant - a knowledgeable, friendly, and professional guide that helps visitors understand our AI-as-a-Service platform.
 
 ${CODIAN_KNOWLEDGE_BASE}
 
 Instructions:
 - Always be helpful, accurate, and professional
-- Use the knowledge base above to answer questions about AIConnect
+- Use the knowledge base above to answer questions about CODIAN
 - If you don't find specific information, politely suggest contacting our sales team
 - Keep responses concise but informative
-- Focus on how AIConnect can solve the user's specific needs
+- Focus on how CODIAN can solve the user's specific needs
 - Use a conversational, approachable tone
-- When discussing pricing, always mention the free tier
-- Highlight the ease of integration and quick setup time
+- Highlight the ease of integration and quick setup time (5-7 business days)
+- Emphasize the fully managed service model and personal account manager
 - Format your responses using Markdown for better readability (use **bold**, *italic*, lists, code blocks, etc.)
 - Use bullet points and numbered lists to organize information clearly
 - Use code blocks for technical examples or API endpoints
 
-Remember: You're representing AIConnect, so be enthusiastic about our platform while remaining professional.`
+Remember: You're representing CODIAN, so be enthusiastic about our platform while remaining professional.`
 
     // Initialize the model
     const model = genAI.getGenerativeModel({ 
@@ -76,7 +76,7 @@ Remember: You're representing AIConnect, so be enthusiastic about our platform w
 Conversation History:
 ${conversationHistory}
 
-Please respond to the user's latest message based on the AIConnect knowledge base and conversation context.`
+Please respond to the user's latest message based on the CODIAN knowledge base and conversation context.`
 
     // Generate response
     console.log('Generating content with Google AI...')
