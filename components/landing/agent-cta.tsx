@@ -117,9 +117,10 @@ export function AgentCTA() {
         <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 p-8 sm:p-12 lg:p-16">
           <div className="relative z-10 grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
-              <h2 className="mb-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl">Ready to Get Started with Human-Enabled AI?</h2>
+              <h2 className="mb-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl">Ready to Get Started?</h2>
               <p className="mb-8 text-pretty text-lg text-muted-foreground">
-                Talk to one of our AI automation specialists and dedicated human managers to learn how CODIAN's AI agents powered by human support can transform your business operations. We'll handle everything from setup to ongoing management with expert human guidance.
+                Talk to one of our AI specialists to learn how CODIAN can transform your business operations. We'll
+                handle everything from setup to ongoing management.
               </p>
 
               <div className="flex flex-col gap-4 sm:flex-row">
