@@ -2,13 +2,13 @@
 
 import type React from "react"
 
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState, useMemo } from "react"
 
 type Theme = "dark" | "light"
 
 type ThemeProviderProps = {
-  children: React.ReactNode
-  defaultTheme?: Theme
+  readonly children: React.ReactNode
+  readonly defaultTheme?: Theme
 }
 
 type ThemeProviderState = {
@@ -18,16 +18,37 @@ type ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined)
 
+const THEME_STORAGE_KEY = "codian-theme"
+
 export function ThemeProvider({ children, defaultTheme = "dark" }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme)
+  const [theme, setTheme] = useState<Theme>(() => {
+    // Initialize from localStorage immediately to prevent flash
+    if (globalThis.window !== undefined) {
+      const stored = globalThis.localStorage.getItem(THEME_STORAGE_KEY) as Theme | null
+      if (stored === "dark" || stored === "light") {
+        // Apply theme immediately before React hydration
+        const root = globalThis.document.documentElement
+        root.classList.remove("light", "dark")
+        root.classList.add(stored)
+        return stored
+      }
+    }
+    return defaultTheme
+  })
 
   useEffect(() => {
-    const root = window.document.documentElement
+    // Apply theme on mount and when it changes
+    const root = globalThis.document.documentElement
     root.classList.remove("light", "dark")
     root.classList.add(theme)
+    
+    // Save to localStorage
+    globalThis.localStorage.setItem(THEME_STORAGE_KEY, theme)
   }, [theme])
 
-  return <ThemeProviderContext.Provider value={{ theme, setTheme }}>{children}</ThemeProviderContext.Provider>
+  const value = useMemo(() => ({ theme, setTheme }), [theme])
+
+  return <ThemeProviderContext.Provider value={value}>{children}</ThemeProviderContext.Provider>
 }
 
 export const useTheme = () => {

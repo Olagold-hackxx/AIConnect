@@ -7,38 +7,104 @@ import { PageHeader } from "@/components/shared/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, ArrowRight } from "lucide-react"
+import { Building2, CreditCard, Calendar, ArrowRight } from "lucide-react"
+import { authService } from "@/lib/auth"
+import { useToast } from "@/components/ui/use-toast"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+
+const signupSchema = z.object({
+  companyName: z.string().min(2, "Company name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  fullName: z.string().min(2, "Full name must be at least 2 characters"),
+  phone: z.string().optional(),
+  website: z.string().url("Invalid URL").optional().or(z.literal("")),
+})
+
+type SignupFormValues = z.infer<typeof signupSchema>
 
 export default function SignUpPage() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
+  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false)
+  const [actionType, setActionType] = useState<"signup" | "consultation" | null>(null)
+
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
     companyName: "",
     email: "",
+      password: "",
+      fullName: "",
     phone: "",
-    companySize: "",
-    industry: "",
     website: "",
+    },
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Store form data (in a real app, this would go to a backend)
-    localStorage.setItem("signupData", JSON.stringify(formData))
-    // Route to schedule consultation page
+  async function handleSignup(proceedToPricing: boolean) {
+    setIsLoading(true)
+    try {
+      // Create tenant first
+      const tenantResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/tenants`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: form.getValues("companyName") }),
+        }
+      )
+
+      if (!tenantResponse.ok) {
+        throw new Error("Failed to create organization")
+      }
+
+      const tenant = await tenantResponse.json()
+
+      // Register user
+      await authService.register({
+        email: form.getValues("email"),
+        password: form.getValues("password"),
+        full_name: form.getValues("fullName"),
+        tenant_id: tenant.id,
+      })
+
+      toast({
+        title: "Success",
+        description: "Account created successfully",
+      })
+
+      if (proceedToPricing) {
+        router.push("/pricing")
+      } else {
     router.push("/schedule-consultation")
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create account",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleSkipToPayment = () => {
-    // Store form data
-    localStorage.setItem("signupData", JSON.stringify(formData))
-    router.push("/payment")
+  async function onSubmit(data: SignupFormValues) {
+    if (actionType === "signup") {
+      await handleSignup(true)
+    } else if (actionType === "consultation") {
+      await handleSignup(false)
+    }
   }
 
   return (
     <PageLayout>
       <PageHeader
         title="Get Started with CODIAN"
-        description="Tell us about your company to get started with human-enabled AI automation"
+        description="Create your account and choose how you'd like to proceed"
       />
       <div className="mx-auto max-w-2xl py-16">
         <Card>
@@ -46,112 +112,124 @@ export default function SignUpPage() {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
               <Building2 className="h-6 w-6 text-primary" />
             </div>
-            <CardTitle className="text-2xl">Company Information</CardTitle>
+            <CardTitle className="text-2xl">Create Your Account</CardTitle>
             <CardDescription>
-              Help us understand your business needs so we can provide the best human-powered AI assistant solution
+              Sign up to get started with human-enabled AI automation
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="companyName" className="mb-2 block text-sm font-medium">
-                  Company Name *
-                </label>
-                <Input
-                  id="companyName"
-                  type="text"
-                  required
-                  value={formData.companyName}
-                  onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                  placeholder="Enter your company name"
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div>
-                <label htmlFor="email" className="mb-2 block text-sm font-medium">
-                  Email Address *
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="your@company.com"
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address *</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="you@company.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div>
-                <label htmlFor="phone" className="mb-2 block text-sm font-medium">
-                  Phone Number *
-                </label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+1 (555) 000-0000"
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password *</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div>
-                <label htmlFor="companySize" className="mb-2 block text-sm font-medium">
-                  Company Size *
-                </label>
-                <Input
-                  id="companySize"
-                  type="text"
-                  required
-                  value={formData.companySize}
-                  onChange={(e) => setFormData({ ...formData, companySize: e.target.value })}
-                  placeholder="e.g., 1-10, 11-50, 51-200, 200+"
+                <FormField
+                  control={form.control}
+                  name="companyName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company Name *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Your Company" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div>
-                <label htmlFor="industry" className="mb-2 block text-sm font-medium">
-                  Industry *
-                </label>
-                <Input
-                  id="industry"
-                  type="text"
-                  required
-                  value={formData.industry}
-                  onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                  placeholder="e.g., Technology, Healthcare, E-commerce"
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input type="tel" placeholder="+1 (555) 000-0000" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div>
-                <label htmlFor="website" className="mb-2 block text-sm font-medium">
-                  Website (Optional)
-                </label>
-                <Input
-                  id="website"
-                  type="url"
-                  value={formData.website}
-                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                  placeholder="https://yourcompany.com"
+                <FormField
+                  control={form.control}
+                  name="website"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Website</FormLabel>
+                      <FormControl>
+                        <Input type="url" placeholder="https://yourcompany.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="flex flex-col gap-4 pt-4">
-                <Button type="submit" size="lg" className="ai-gradient w-full group">
-                  Schedule Consultation
+                <div className="flex flex-col gap-3 pt-4">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full"
+                    onClick={() => setActionType("signup")}
+                    disabled={isLoading}
+                  >
+                    Sign Up
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
                 <Button
-                  type="button"
+                    type="submit"
                   variant="outline"
                   size="lg"
-                  onClick={handleSkipToPayment}
                   className="w-full"
+                    onClick={() => setActionType("consultation")}
+                    disabled={isLoading}
                 >
-                  Skip & Go to Payment
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Schedule Consultation
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </div>
             </form>
+            </Form>
           </CardContent>
         </Card>
       </div>

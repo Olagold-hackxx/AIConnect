@@ -53,6 +53,9 @@ export function Navigation() {
               Contact
             </Link>
             <ThemeToggle />
+            <Button size="sm" variant="ghost" asChild>
+              <Link href="/login">Sign In</Link>
+            </Button>
             <Button size="sm" className="ai-gradient" asChild>
               <Link href="/signup">Get Started</Link>
             </Button>
@@ -106,8 +109,11 @@ export function Navigation() {
               >
                 Contact
               </Link>
+              <Button size="sm" variant="ghost" asChild>
+                <Link href="/login" onClick={() => setIsOpen(false)}>Sign In</Link>
+              </Button>
               <Button size="sm" className="ai-gradient" asChild>
-                <Link href="/signup">Get Started</Link>
+                <Link href="/signup" onClick={() => setIsOpen(false)}>Get Started</Link>
               </Button>
             </div>
           </div>

@@ -22,9 +22,15 @@ export default function ScheduleConsultationPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, this would submit to a backend
-    // For now, just navigate to payment
-    router.push("/payment")
+    // Store consultation data
+    const consultationData = {
+      date: selectedDate,
+      time: selectedTime,
+      notes,
+    }
+    localStorage.setItem("consultationData", JSON.stringify(consultationData))
+    // Navigate to pricing page to select a plan
+    router.push("/pricing")
   }
 
   return (
