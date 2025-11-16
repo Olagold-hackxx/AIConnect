@@ -64,3 +64,6 @@ alembic/versions/*.py
 .DS_Store
 Thumbs.db
 
+
+# ChromaDB
+chroma_db/
