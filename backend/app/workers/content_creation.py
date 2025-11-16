@@ -1,0 +1,1618 @@
+"""
+Content Creation Celery Tasks
+"""
+from app.workers import celery_app
+from app.utils.logger import logger
+from uuid import UUID
+import asyncio
+from typing import Dict, Any, List, Optional
+
+
+async def _retrieve_rag_context_async(
+    tenant_id: str,
+    assistant_id: str,
+    query: str,
+    limit: int = 5
+) -> Dict[str, Any]:
+    """
+    Async helper function to retrieve RAG context.
+    Can be called directly from async contexts.
+    """
+    from app.db.session import create_worker_session_factory
+    from app.services.rag_service import RAGService
+    
+    # Create a new session factory for this worker task
+    SessionFactory = create_worker_session_factory()
+    db = SessionFactory()
+    try:
+        rag_service = RAGService(db, UUID(tenant_id))
+        chunks = await rag_service.retrieve_relevant_context(
+            query=query,
+            limit=limit,
+            assistant_id=UUID(assistant_id) if assistant_id else None
+        )
+        return {
+            "success": True,
+            "chunks": chunks,
+            "count": len(chunks)
+        }
+    finally:
+        await db.close()
+
+
+@celery_app.task(name="rag.retrieve_context", bind=True, max_retries=3)
+def retrieve_rag_context(
+    self,
+    tenant_id: str,
+    assistant_id: str,
+    query: str,
+    limit: int = 5
+) -> Dict[str, Any]:
+    """
+    Retrieve relevant context from documents using RAG
+    
+    Args:
+        tenant_id: Tenant UUID string
+        assistant_id: Assistant UUID string
+        query: User query/question
+        limit: Number of relevant chunks to retrieve
+    
+    Returns:
+        Dictionary with context chunks
+    """
+    try:
+        # Create a new event loop for this task
+        # In Celery workers, we should not have a running loop
+        try:
+            # Try to get existing loop
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+            elif loop.is_running():
+                # If loop is running, we can't use run_until_complete
+                raise RuntimeError("Event loop is already running. Cannot use run_until_complete.")
+        except RuntimeError:
+            # No event loop exists, create a new one
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        chunks_result = loop.run_until_complete(
+            _retrieve_rag_context_async(tenant_id, assistant_id, query, limit)
+        )
+        loop.close()
+        
+        return chunks_result
+    
+    except Exception as e:
+        logger.error(f"RAG retrieval failed: {str(e)}")
+        # Retry on failure
+        raise self.retry(exc=e, countdown=60)
+
+
+async def _generate_image_async(
+    prompt: str,
+    aspect_ratio: str = "1:1",
+    number_of_images: int = 1
+) -> Dict[str, Any]:
+    """
+    Async helper function to generate images using AI.
+    Can be called directly from async contexts.
+    """
+    from app.services.llm.factory import create_llm_service
+    
+    llm_service = create_llm_service()
+    images = await llm_service.generate_image(
+        prompt=prompt,
+        aspect_ratio=aspect_ratio,
+        number_of_images=number_of_images
+    )
+    return {
+        "success": True,
+        "images": images if isinstance(images, list) else [images] if images else [],
+        "count": len(images) if isinstance(images, list) else (1 if images else 0)
+    }
+
+
+async def _upload_media_async(
+    tenant_id: str,
+    execution_id: str,
+    media_type: str,  # "image" or "video"
+    media_data: Any,  # bytes, PIL Image, or file-like object
+    filename: str
+) -> Dict[str, Any]:
+    """
+    Async helper function to upload generated media to storage.
+    Can be called directly from async contexts.
+    
+    Args:
+        tenant_id: Tenant UUID string
+        execution_id: Execution UUID string
+        media_type: "image" or "video"
+        media_data: Media data (bytes from Gemini, PIL Image, etc.)
+        filename: Filename for storage
+    
+    Returns:
+        Dictionary with storage URL
+    """
+    try:
+        from app.services.storage import get_storage
+        from io import BytesIO
+        import uuid as uuid_lib
+        
+        storage = get_storage()
+        
+        if media_type == "image":
+            # Handle image data - can be bytes, PIL Image, or file-like object
+            img_bytes = BytesIO()
+            
+            if isinstance(media_data, bytes):
+                # Already bytes (from Gemini image generation)
+                img_bytes.write(media_data)
+            elif hasattr(media_data, 'save'):
+                # PIL Image object
+                media_data.save(img_bytes, format="PNG")
+            elif hasattr(media_data, 'read'):
+                # File-like object
+                img_bytes.write(media_data.read())
+            else:
+                # Try to convert to bytes
+                img_bytes.write(bytes(media_data))
+            
+            img_bytes.seek(0)
+            
+            storage_key = f"tenants/{tenant_id}/content/{execution_id}/images/{uuid_lib.uuid4()}.png"
+            url = await storage.upload(
+                key=storage_key,
+                file=img_bytes,
+                content_type="image/png"
+            )
+            logger.info(f"Uploaded image to storage: {storage_key}, URL: {url}")
+            return {
+                "success": True,
+                "url": url,
+                "media_type": media_type
+            }
+        
+        elif media_type == "video":
+            # Handle video bytes
+            video_bytes = BytesIO()
+            
+            if isinstance(media_data, bytes):
+                video_bytes.write(media_data)
+            elif hasattr(media_data, 'read'):
+                video_bytes.write(media_data.read())
+            else:
+                video_bytes.write(bytes(media_data))
+            
+            video_bytes.seek(0)
+            
+            storage_key = f"tenants/{tenant_id}/content/{execution_id}/videos/{uuid_lib.uuid4()}.mp4"
+            url = await storage.upload(
+                key=storage_key,
+                file=video_bytes,
+                content_type="video/mp4"
+            )
+            logger.info(f"Uploaded video to storage: {storage_key}, URL: {url}")
+            return {
+                "success": True,
+                "url": url,
+                "media_type": media_type
+            }
+        
+        else:
+            raise ValueError(f"Unsupported media_type: {media_type}")
+            
+    except Exception as e:
+        logger.error(f"Media upload failed: {str(e)}", exc_info=True)
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+async def _generate_video_async(
+    prompt: str,
+    duration_seconds: int = 30
+) -> Dict[str, Any]:
+    """
+    Async helper function to generate video using AI.
+    Can be called directly from async contexts.
+    """
+    from app.services.llm.factory import create_llm_service
+    
+    llm_service = create_llm_service()
+    video = await llm_service.generate_video(
+        prompt=prompt,
+        duration_seconds=duration_seconds
+    )
+    return {
+        "success": True,
+        "video": video
+    }
+
+
+async def _generate_content_direct(
+    tenant_id: str,
+    assistant_id: str,
+    request: str,
+    context: str = "",
+    keyword_results: Optional[Dict[str, Any]] = None,
+    platform: Optional[str] = None
+) -> str:
+    """
+    Generate content directly using LLM (not through agent).
+    Keyword research is done separately and results are appended to the prompt.
+    
+    Args:
+        tenant_id: Tenant UUID string
+        assistant_id: Assistant UUID string
+        request: User request from frontend
+        context: RAG context from documents
+        keyword_results: Results from keyword research tool
+        platform: Platform name for platform-specific content
+    
+    Returns:
+        Generated content string
+    """
+    from app.db.session import create_worker_session_factory
+    from sqlalchemy import select
+    from app.models.tenant import Tenant
+    from app.services.llm.factory import create_llm_service
+    
+    # Create a new session factory for this worker task
+    SessionFactory = create_worker_session_factory()
+    db = SessionFactory()
+    try:
+        # Get tenant config
+        tenant_result = await db.execute(
+            select(Tenant).where(Tenant.id == UUID(tenant_id))
+        )
+        tenant = tenant_result.scalar_one_or_none()
+        
+        if not tenant:
+            raise ValueError(f"Tenant {tenant_id} not found")
+        
+        # Build system prompt
+        brand_voice = tenant.brand_voice or "professional"
+        target_audience = tenant.target_audience or ""
+        offerings = tenant.offerings or ""
+        
+        system_prompt = f"""You are a Digital Marketing Assistant. Your job is to create engaging, platform-appropriate social media content.
+
+Brand Guidelines:
+- Voice & Tone: {brand_voice}
+- Target Audience: {target_audience}
+- Products/Services: {offerings}
+
+IMPORTANT: Generate ONE single, final post that is ready to publish immediately. Do NOT provide multiple options, variations, or alternatives. Do NOT include labels like "Option 1", "Option 2", "Headline:", "Body:", "Call to Action:" - just write the complete post content as it should appear when published. Do not explain your process or steps - just return the final, ready-to-post content."""
+        
+        # Build platform-specific instructions
+        platform_instruction = ""
+        if platform:
+            platform_guidelines = {
+                "linkedin": "LinkedIn: Professional tone, 150-300 words, focus on business value, use industry insights, include a call-to-action. Avoid emojis except sparingly.",
+                "twitter": "Twitter/X: Concise and engaging, 1-2 sentences or 280 characters max, use relevant hashtags (2-3), conversational tone, can include emojis.",
+                "facebook": "Facebook: Conversational and friendly, 100-250 words, encourage engagement with questions, can use emojis, include a clear call-to-action.",
+                "instagram": "Instagram: Visual-first thinking, 125-220 words, use emojis, include 5-10 relevant hashtags, focus on storytelling and visual appeal.",
+                "tiktok": "TikTok: Short, punchy, and entertaining, 50-150 words, use trending language, include hooks, focus on quick value or entertainment."
+            }
+            if platform.lower() in platform_guidelines:
+                platform_instruction = f"\n\nPlatform Requirements: {platform_guidelines[platform.lower()]}"
+        
+        # Get website URL from tenant
+        website_url = tenant.website_url or ""
+        
+        # Build user prompt
+        user_prompt = request
+        
+        # Add context if available
+        if context:
+            user_prompt += f"\n\nRelevant Context:\n{context}"
+        
+        # Add keyword results if available
+        if keyword_results and keyword_results.get("keywords"):
+            keywords = keyword_results.get("keywords", [])
+            keyword_list = ", ".join([k.get("keyword", "") for k in keywords[:10]])
+            user_prompt += f"\n\nRelevant Keywords: {keyword_list}"
+            if keyword_results.get("seed_keyword"):
+                user_prompt += f"\nPrimary Topic: {keyword_results.get('seed_keyword')}"
+        
+        # Add website URL instruction
+        if website_url:
+            user_prompt += f"\n\nIMPORTANT: Include the website URL ({website_url}) in the content where appropriate (e.g., in call-to-action, links, etc.)."
+        
+        # Add platform instruction
+        if platform_instruction:
+            user_prompt += platform_instruction
+        
+        # Get LLM service and generate content
+        llm_service = create_llm_service()
+        content = await llm_service.generate_content(
+            prompt=user_prompt,
+            system_instruction=system_prompt,
+            temperature=0.7,
+            max_tokens=1000
+        )
+        
+        return content.strip()
+    finally:
+        await db.close()
+
+
+@celery_app.task(name="content.generate", bind=True, max_retries=2)
+def generate_content(
+    self,
+    tenant_id: str,
+    assistant_id: str,
+    request: str,
+    context: str = ""
+) -> Dict[str, Any]:
+    """
+    Generate content using AI agent
+    
+    Args:
+        tenant_id: Tenant UUID string
+        assistant_id: Assistant UUID string
+        request: User request
+        context: RAG context from documents
+    
+    Returns:
+        Dictionary with generated content and metadata
+    """
+    try:
+        # Create a new event loop for this task
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+            elif loop.is_running():
+                raise RuntimeError("Event loop is already running. Cannot use run_until_complete.")
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        result = loop.run_until_complete(
+            _generate_content_async(tenant_id, assistant_id, request, context)
+        )
+        loop.close()
+        
+        return result
+    
+    except Exception as e:
+        logger.error(f"Content generation failed: {str(e)}")
+        raise self.retry(exc=e, countdown=120)
+
+
+@celery_app.task(name="content.generate_image", bind=True, max_retries=2)
+def generate_image_task(
+    self,
+    prompt: str,
+    aspect_ratio: str = "1:1",
+    number_of_images: int = 1
+) -> Dict[str, Any]:
+    """
+    Generate images using AI
+    
+    Args:
+        prompt: Image generation prompt
+        aspect_ratio: Image aspect ratio
+        number_of_images: Number of images to generate
+    
+    Returns:
+        Dictionary with image data or URLs
+    """
+    try:
+        # Create a new event loop for this task
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        async def _generate():
+            from app.services.llm.factory import create_llm_service
+            
+            llm_service = create_llm_service()
+            images = await llm_service.generate_image(
+                prompt=prompt,
+                aspect_ratio=aspect_ratio,
+                number_of_images=number_of_images
+            )
+            return images
+        
+        images = loop.run_until_complete(_generate())
+        loop.close()
+        
+        return {
+            "success": True,
+            "images": images if isinstance(images, list) else [images] if images else [],
+            "count": len(images) if isinstance(images, list) else (1 if images else 0)
+        }
+    
+    except Exception as e:
+        logger.error(f"Image generation failed: {str(e)}")
+        raise self.retry(exc=e, countdown=60)
+
+
+@celery_app.task(name="content.generate_video", bind=True, max_retries=2)
+def generate_video_task(
+    self,
+    prompt: str,
+    duration_seconds: int = 30
+) -> Dict[str, Any]:
+    """
+    Generate video using AI
+    
+    Args:
+        prompt: Video generation prompt
+        duration_seconds: Video duration
+    
+    Returns:
+        Dictionary with video data or URL
+    """
+    try:
+        # Create a new event loop for this task
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        async def _generate():
+            from app.services.llm.factory import create_llm_service
+            
+            llm_service = create_llm_service()
+            video = await llm_service.generate_video(
+                prompt=prompt,
+                duration_seconds=duration_seconds
+            )
+            return video
+        
+        video = loop.run_until_complete(_generate())
+        loop.close()
+        
+        return {
+            "success": True,
+            "video": video
+        }
+    
+    except Exception as e:
+        logger.error(f"Video generation failed: {str(e)}")
+        raise self.retry(exc=e, countdown=120)
+
+
+@celery_app.task(name="content.upload_media", bind=True, max_retries=3)
+def upload_media_to_storage(
+    self,
+    tenant_id: str,
+    execution_id: str,
+    media_type: str,  # "image" or "video"
+    media_data: Any,  # PIL Image, bytes, or file object
+    filename: str
+) -> Dict[str, Any]:
+    """
+    Upload generated media to storage
+    
+    Args:
+        tenant_id: Tenant UUID string
+        execution_id: Execution UUID string
+        media_type: "image" or "video"
+        media_data: Media data (PIL Image, bytes, etc.)
+        filename: Filename for storage
+    
+    Returns:
+        Dictionary with storage URL
+    """
+    try:
+        # Create a new event loop for this task
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        async def _upload():
+            from app.services.storage import get_storage
+            from io import BytesIO
+            import uuid as uuid_lib
+            
+            storage = get_storage()
+            
+            if media_type == "image":
+                # Handle image data - can be bytes, PIL Image, or file-like object
+                img_bytes = BytesIO()
+                
+                if isinstance(media_data, bytes):
+                    # Already bytes (from Gemini image generation)
+                    img_bytes.write(media_data)
+                elif hasattr(media_data, 'save'):
+                    # PIL Image object
+                    media_data.save(img_bytes, format="PNG")
+                elif hasattr(media_data, 'read'):
+                    # File-like object
+                    img_bytes.write(media_data.read())
+                else:
+                    # Try to convert to bytes
+                    img_bytes.write(bytes(media_data))
+                
+                img_bytes.seek(0)
+                
+                storage_key = f"tenants/{tenant_id}/content/{execution_id}/images/{uuid_lib.uuid4()}.png"
+                url = await storage.upload(
+                    key=storage_key,
+                    file=img_bytes,
+                    content_type="image/png"
+                )
+                logger.info(f"Uploaded image to storage: {storage_key}, URL: {url}")
+                return url
+            
+            elif media_type == "video":
+                # Handle video bytes
+                if isinstance(media_data, bytes):
+                    video_bytes = BytesIO(media_data)
+                else:
+                    video_bytes = media_data
+                
+                storage_key = f"tenants/{tenant_id}/content/{execution_id}/videos/{uuid_lib.uuid4()}.mp4"
+                url = await storage.upload(
+                    key=storage_key,
+                    file=video_bytes,
+                    content_type="video/mp4"
+                )
+                return url
+        
+        url = loop.run_until_complete(_upload())
+        loop.close()
+        
+        return {
+            "success": True,
+            "url": url,
+            "media_type": media_type
+        }
+    
+    except Exception as e:
+        logger.error(f"Media upload failed: {str(e)}")
+        raise self.retry(exc=e, countdown=30)
+
+
+async def _post_to_social_platform_async(
+    platform: str,
+    content: str,
+    access_token: str,
+    integration_data: Dict[str, Any],
+    media_urls: Optional[List[str]] = None,
+    integration=None,
+    db_session=None
+) -> Dict[str, Any]:
+    """
+    Async helper function to post content to social platforms.
+    Can be called directly from async contexts.
+    """
+    from app.services.integrations.social import ( 
+        FacebookPostingService, InstagramPostingService, 
+        LinkedInPostingService, TwitterPostingService, TikTokPostingService 
+    )
+    import asyncio
+    
+    logger.info(f"[{platform}] Starting post to {platform}...")
+    logger.debug(f"[{platform}] Content length: {len(content)}, Has media: {bool(media_urls)}, Integration data keys: {list(integration_data.keys())}")
+    
+    # Clean markdown formatting from content before posting
+    from app.utils.content_formatter import clean_markdown_for_social
+    cleaned_content = clean_markdown_for_social(content, platform=platform)
+    logger.debug(f"[{platform}] Cleaned content (removed markdown): {cleaned_content[:200]}...")
+    
+    try:
+        # Posting services are synchronous, so run them in a thread
+        if platform == "facebook":
+            page_id = integration_data.get("page_id")
+            logger.info(f"[{platform}] Required params - page_id: {page_id}, access_token: {'present' if access_token else 'missing'}")
+            if not page_id:
+                logger.error(f"[{platform}] Missing required parameter: page_id")
+                return {"success": False, "error": "Facebook page_id not found"}
+            if not access_token:
+                logger.error(f"[{platform}] Missing required parameter: access_token")
+                return {"success": False, "error": "Facebook access_token not found"}
+            
+            logger.info(f"[{platform}] Calling FacebookPostingService.post with page_id={page_id}")
+            post_result = await asyncio.to_thread(
+                FacebookPostingService.post,
+                content=cleaned_content,
+                access_token=access_token,
+                page_id=page_id,
+                media_urls=media_urls
+            )
+            logger.info(f"[{platform}] Facebook post completed: success={post_result.get('success')}")
+            return post_result
+        
+        elif platform == "instagram":
+            ig_user_id = integration_data.get("ig_user_id") or integration_data.get("instagram_user_id")
+            logger.info(f"[{platform}] Required params - ig_user_id: {ig_user_id}, access_token: {'present' if access_token else 'missing'}")
+            if not ig_user_id:
+                logger.error(f"[{platform}] Missing required parameter: ig_user_id")
+                return {"success": False, "error": "Instagram user_id not found"}
+            if not access_token:
+                logger.error(f"[{platform}] Missing required parameter: access_token")
+                return {"success": False, "error": "Instagram access_token not found"}
+            
+            logger.info(f"[{platform}] Calling InstagramPostingService.post with ig_user_id={ig_user_id}")
+            post_result = await asyncio.to_thread(
+                InstagramPostingService.post,
+                content=cleaned_content,
+                access_token=access_token,
+                ig_user_id=ig_user_id,
+                media_urls=media_urls
+            )
+            logger.info(f"[{platform}] Instagram post completed: success={post_result.get('success')}")
+            return post_result
+        
+        elif platform == "linkedin":
+            entity_id = integration_data.get("entity_id") or integration_data.get("organization_id")
+            is_organization = integration_data.get("is_organization", False)
+            logger.info(f"[{platform}] Required params - entity_id: {entity_id}, is_organization: {is_organization}, access_token: {'present' if access_token else 'missing'}")
+            if not entity_id:
+                logger.error(f"[{platform}] Missing required parameter: entity_id")
+                return {"success": False, "error": "LinkedIn entity_id not found"}
+            if not access_token:
+                logger.error(f"[{platform}] Missing required parameter: access_token")
+                return {"success": False, "error": "LinkedIn access_token not found"}
+            
+            # Clean markdown formatting from content before posting
+            from app.utils.content_formatter import clean_markdown_for_social
+            cleaned_content = clean_markdown_for_social(content, platform="linkedin")
+            logger.info(f"[{platform}] Calling LinkedInPostingService.post with entity_id={entity_id}, is_organization={is_organization}")
+            logger.debug(f"[{platform}] Original content length: {len(content)}, Cleaned content length: {len(cleaned_content)}")
+            logger.debug(f"[{platform}] Cleaned content preview: {cleaned_content[:100]}..., Media URLs count: {len(media_urls) if media_urls else 0}")
+            try:
+                post_result = await asyncio.to_thread(
+                    LinkedInPostingService.post,
+                    content=cleaned_content,
+                    access_token=access_token,
+                    entity_id=entity_id,
+                    is_organization=is_organization,
+                    media_urls=media_urls
+                )
+                logger.info(f"[{platform}] LinkedIn post completed: success={post_result.get('success')}")
+                if not post_result.get("success"):
+                    error_msg = post_result.get('error', 'Unknown error')
+                    logger.error(f"[{platform}] LinkedIn post error: {error_msg}")
+                    logger.debug(f"[{platform}] Full error response: {error_msg}")
+                return post_result
+            except Exception as e:
+                logger.error(f"[{platform}] Exception in LinkedInPostingService.post: {str(e)}", exc_info=True)
+                return {"success": False, "error": f"LinkedIn posting exception: {str(e)}"}
+        
+        elif platform == "twitter":
+            logger.info(f"[{platform}] Required params - access_token: {'present' if access_token else 'missing'}")
+            if not access_token:
+                logger.error(f"[{platform}] Missing required parameter: access_token")
+                return {"success": False, "error": "Twitter access_token not found"}
+            
+            # Get Twitter OAuth config for token refresh
+            refresh_token = None
+            client_id = None
+            client_secret = None
+            token_expires_at = None
+            integration_id = None
+            
+            if integration:
+                refresh_token = integration.refresh_token
+                token_expires_at = integration.token_expires_at
+                integration_id = str(integration.id)
+                
+                # Get OAuth config
+                try:
+                    from app.services.integration_service import IntegrationService
+                    integration_service = IntegrationService(db_session) if db_session else None
+                    if integration_service:
+                        config = await integration_service.get_integration_config("twitter")
+                        if config:
+                            client_id = config.client_id
+                            client_secret = config.client_secret
+                except Exception as config_error:
+                    logger.warning(f"[{platform}] Failed to get Twitter OAuth config: {str(config_error)}")
+            
+            logger.info(f"[{platform}] Calling TwitterPostingService.post (with token refresh if needed)")
+            # TwitterPostingService.post is now async, so call it directly
+            post_result = await TwitterPostingService.post(
+                text=cleaned_content,
+                access_token=access_token,
+                image_urls=media_urls,
+                refresh_token=refresh_token,
+                client_id=client_id,
+                client_secret=client_secret,
+                token_expires_at=token_expires_at,
+                integration_id=integration_id,
+                db_session=db_session
+            )
+            logger.info(f"[{platform}] Twitter post completed: success={post_result.get('success')}")
+            if not post_result.get("success"):
+                logger.error(f"[{platform}] Twitter post error: {post_result.get('error')}")
+            return post_result
+        
+        elif platform == "tiktok":
+            logger.info(f"[{platform}] Required params - access_token: {'present' if access_token else 'missing'}, has_video: {bool(media_urls and any(url.endswith(('.mp4', '.mov', '.avi')) for url in media_urls))}")
+            if not access_token:
+                logger.error(f"[{platform}] Missing required parameter: access_token")
+                return {"success": False, "error": "TikTok access_token not found"}
+            if not media_urls or not any(url.endswith(('.mp4', '.mov', '.avi')) for url in (media_urls or [])):
+                logger.error(f"[{platform}] Missing required parameter: video URL")
+                return {"success": False, "error": "TikTok requires a video"}
+            
+            logger.info(f"[{platform}] Calling TikTokPostingService.post")
+            post_result = await asyncio.to_thread(
+                TikTokPostingService.post,
+                content=cleaned_content,
+                access_token=access_token,
+                media_urls=media_urls or []
+            )
+            logger.info(f"[{platform}] TikTok post completed: success={post_result.get('success')}")
+            return post_result
+        
+        else:
+            logger.error(f"[{platform}] Unsupported platform: {platform}")
+            return {"success": False, "error": f"Unsupported platform for posting: {platform}"}
+    
+    except Exception as e:
+        logger.error(f"[{platform}] Exception during posting: {str(e)}", exc_info=True)
+        return {"success": False, "error": f"Posting failed: {str(e)}"}
+
+
+@celery_app.task(name="content.post_to_platform", bind=True, max_retries=3)
+def post_to_social_platform(
+    self,
+    platform: str,
+    content: str,
+    access_token: str,
+    integration_data: Dict[str, Any],
+    media_urls: Optional[List[str]] = None
+) -> Dict[str, Any]:
+    """
+    Post content to a social media platform
+    
+    Args:
+        platform: Platform name (facebook, instagram, etc.)
+        content: Post content
+        access_token: Platform access token
+        integration_data: Platform-specific integration data
+        media_urls: Optional media URLs
+    
+    Returns:
+        Dictionary with post result
+    """
+    try:
+        from app.services.integrations.social import (
+            FacebookPostingService,
+            InstagramPostingService,
+            LinkedInPostingService,
+            TwitterPostingService,
+            TikTokPostingService
+        )
+        
+        if platform == "facebook":
+            page_id = integration_data.get("page_id")
+            if not page_id:
+                return {"success": False, "error": "Facebook page_id not found"}
+            return FacebookPostingService.post(
+                content=content,
+                access_token=access_token,
+                page_id=page_id,
+                media_urls=media_urls
+            )
+        
+        elif platform == "instagram":
+            ig_user_id = integration_data.get("ig_user_id") or integration_data.get("instagram_user_id")
+            if not ig_user_id:
+                return {"success": False, "error": "Instagram user_id not found"}
+            return InstagramPostingService.post(
+                content=content,
+                access_token=access_token,
+                ig_user_id=ig_user_id,
+                media_urls=media_urls
+            )
+        
+        elif platform == "linkedin":
+            entity_id = integration_data.get("entity_id") or integration_data.get("organization_id")
+            is_organization = integration_data.get("is_organization", False)
+            if not entity_id:
+                return {"success": False, "error": "LinkedIn entity_id not found"}
+            return LinkedInPostingService.post(
+                content=content,
+                access_token=access_token,
+                entity_id=entity_id,
+                is_organization=is_organization,
+                media_urls=media_urls
+            )
+        
+        elif platform == "twitter":
+            return TwitterPostingService.post(
+                text=content,
+                access_token=access_token,
+                image_urls=media_urls
+            )
+        
+        elif platform == "tiktok":
+            if not media_urls or not any(url.endswith(('.mp4', '.mov', '.avi')) for url in (media_urls or [])):
+                return {"success": False, "error": "TikTok requires a video"}
+            return TikTokPostingService.post(
+                content=content,
+                access_token=access_token,
+                media_urls=media_urls or []
+            )
+        
+        else:
+            return {"success": False, "error": f"Unsupported platform: {platform}"}
+    
+    except Exception as e:
+        logger.error(f"Posting to {platform} failed: {str(e)}")
+        raise self.retry(exc=e, countdown=60)
+
+
+@celery_app.task(name="content.create_execution", bind=True, max_retries=1)
+def execute_content_creation(
+    self,
+    execution_id: str,
+    tenant_id: str,
+    assistant_id: str,
+    request_data: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    Main Celery task for content creation execution
+    
+    This orchestrates the entire workflow:
+    1. RAG retrieval
+    2. Content generation
+    3. Image/video generation (if requested)
+    4. Media upload
+    5. Social media posting
+    6. Database updates
+    
+    Args:
+        execution_id: Execution UUID string
+        tenant_id: Tenant UUID string
+        assistant_id: Assistant UUID string
+        request_data: Request data with user request, platforms, etc.
+    
+    Returns:
+        Execution result
+    """
+    try:
+        # Create a new event loop for this task
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        async def _execute():
+            from app.db.session import create_worker_session_factory
+            from app.services.agent_execution_service import AgentExecutionService
+            from app.models.content import ContentItem
+            from app.models.integration import SocialIntegration
+            from sqlalchemy import select
+            from datetime import datetime, timezone
+            
+            # Create a new session factory for this worker task
+            SessionFactory = create_worker_session_factory()
+            db = SessionFactory()
+            try:
+                execution_service = AgentExecutionService(db)
+                
+                # Update status to running
+                await execution_service.update_execution(
+                    execution_id=UUID(execution_id),
+                    status="running"
+                )
+                
+                user_request = request_data.get("request", "")
+                platforms = request_data.get("platforms", [])
+                include_images = request_data.get("include_images", False)
+                include_video = request_data.get("include_video", False)
+                
+                # Task tracking for logging
+                tasks = []
+                
+                # Step 1: RAG retrieval (call async helper directly)
+                logger.info("=" * 80)
+                logger.info("CONTENT CREATION EXECUTION STARTED")
+                logger.info(f"Execution ID: {execution_id}")
+                logger.info(f"Tenant ID: {tenant_id}")
+                logger.info(f"Assistant ID: {assistant_id}")
+                logger.info(f"Platforms: {platforms}")
+                logger.info(f"Include Images: {include_images}, Include Video: {include_video}")
+                logger.info("=" * 80)
+                
+                logger.info("[TASK 1/6] Starting RAG retrieval...")
+                rag_result = await _retrieve_rag_context_async(
+                    tenant_id=tenant_id,
+                    assistant_id=assistant_id,
+                    query=user_request,
+                    limit=10  # Increased from 5 to 10 for better retrieval
+                )
+                
+                context = ""
+                if rag_result.get("success") and rag_result.get("chunks"):
+                    chunks_count = len(rag_result.get("chunks", []))
+                    context_parts = ["RELEVANT CONTEXT FROM KNOWLEDGE BASE:"]
+                    for i, chunk in enumerate(rag_result["chunks"], 1):
+                        context_parts.append(
+                            f"\n[{i}] Source: {chunk['source']}\n"
+                            f"Content: {chunk['content'][:500]}..."
+                        )
+                    context = "\n".join(context_parts)
+                    tasks.append({"task": "RAG Retrieval", "status": "PASSED", "details": f"Retrieved {chunks_count} relevant chunks"})
+                    logger.info(f"[TASK 1/6] ✓ PASSED - Retrieved {chunks_count} relevant chunks from knowledge base")
+                else:
+                    tasks.append({"task": "RAG Retrieval", "status": "FAILED", "details": "No chunks retrieved"})
+                    logger.warning("[TASK 1/6] ✗ FAILED - No chunks retrieved from knowledge base")
+                
+                # Step 2: Keyword Research
+                logger.info("[TASK 2/6] Starting keyword research...")
+                keyword_results = None
+                try:
+                    from app.services.integrations.seo import SerpAPIService
+                    serp_service = SerpAPIService()
+                    # Extract main topic from user request for keyword research
+                    keyword_query = user_request[:100]  # Use first 100 chars as query
+                    keyword_results = await serp_service.keyword_research(
+                        query=keyword_query,
+                        location="United States",
+                        limit=10
+                    )
+                    keywords_count = len(keyword_results.get('keywords', []))
+                    tasks.append({"task": "Keyword Research", "status": "PASSED", "details": f"Found {keywords_count} keywords"})
+                    logger.info(f"[TASK 2/6] ✓ PASSED - Found {keywords_count} keywords")
+                except Exception as e:
+                    tasks.append({"task": "Keyword Research", "status": "FAILED", "details": str(e)})
+                    logger.warning(f"[TASK 2/6] ✗ FAILED - Keyword research failed: {str(e)}, continuing without keywords")
+                
+                # Step 3: Generate content using LLM (with keywords appended)
+                logger.info("[TASK 3/6] Starting content generation...")
+                platform_contents = {}
+                content_generation_passed = 0
+                content_generation_failed = 0
+                
+                if platforms:
+                    # Generate platform-specific content for each platform
+                    for platform in platforms:
+                        logger.info(f"[TASK 3/6] Generating content for {platform}...")
+                        try:
+                            content_result = await _generate_content_direct(
+                                tenant_id=tenant_id,
+                                assistant_id=assistant_id,
+                                request=user_request,
+                                context=context,
+                                keyword_results=keyword_results,
+                                platform=platform
+                            )
+                            if content_result and content_result.strip():
+                                platform_contents[platform] = content_result
+                                content_generation_passed += 1
+                                logger.info(f"[TASK 3/6] ✓ PASSED - Content generated for {platform} ({len(content_result)} chars)")
+                            else:
+                                content_generation_failed += 1
+                                logger.warning(f"[TASK 3/6] ✗ FAILED - Empty content for {platform}")
+                        except Exception as e:
+                            content_generation_failed += 1
+                            logger.error(f"[TASK 3/6] ✗ FAILED - Content generation error for {platform}: {str(e)}")
+                else:
+                    # No platforms specified, generate generic content
+                    try:
+                        content_result = await _generate_content_direct(
+                            tenant_id=tenant_id,
+                            assistant_id=assistant_id,
+                            request=user_request,
+                            context=context,
+                            keyword_results=keyword_results,
+                            platform=None
+                        )
+                        if content_result and content_result.strip():
+                            # Use same content for all platforms if not specified
+                            for platform in platforms:
+                                platform_contents[platform] = content_result
+                            content_generation_passed = len(platforms) if platforms else 1
+                            logger.info(f"[TASK 3/6] ✓ PASSED - Generic content generated ({len(content_result)} chars)")
+                        else:
+                            content_generation_failed = 1
+                            logger.warning("[TASK 3/6] ✗ FAILED - Empty generic content")
+                    except Exception as e:
+                        content_generation_failed = 1
+                        logger.error(f"[TASK 3/6] ✗ FAILED - Generic content generation error: {str(e)}")
+                
+                # Log content generation summary
+                if content_generation_passed > 0:
+                    tasks.append({"task": "Content Generation", "status": "PASSED", "details": f"{content_generation_passed} platform(s) succeeded"})
+                if content_generation_failed > 0:
+                    tasks.append({"task": "Content Generation", "status": "PARTIAL", "details": f"{content_generation_failed} platform(s) failed"})
+                
+                # Check if we have content for at least one platform
+                if not platform_contents or not any(platform_contents.values()):
+                    tasks.append({"task": "Content Generation", "status": "FAILED", "details": "No content generated for any platform"})
+                    await execution_service.update_execution(
+                        execution_id=UUID(execution_id),
+                        status="failed",
+                        error_message="Content generation returned empty result for all platforms"
+                    )
+                    logger.error("=" * 80)
+                    logger.error("CONTENT CREATION EXECUTION FAILED")
+                    logger.error("=" * 80)
+                    return {
+                        "success": False,
+                        "error": "Content generation returned empty result for all platforms"
+                    }
+                
+                # Step 4: Generate images/videos if requested (using generated content)
+                logger.info("[TASK 4/6] Starting media generation...")
+                image_urls = []
+                video_urls = []
+                
+                if include_images:
+                    logger.info("[TASK 4/6] Generating images...")
+                    try:
+                        # Use the first platform's content for image generation prompt
+                        image_prompt = user_request
+                        if platform_contents:
+                            first_platform_content = next(iter(platform_contents.values()), "")
+                            if first_platform_content:
+                                image_prompt = first_platform_content[:200]  # Use first 200 chars of generated content
+                        
+                        # Call async helper directly instead of Celery task
+                        image_result = await _generate_image_async(
+                            prompt=image_prompt,
+                            aspect_ratio="1:1",
+                            number_of_images=1
+                        )
+                        
+                        if image_result.get("success"):
+                            images = image_result.get("images", [])
+                            uploaded_count = 0
+                            # Upload each image
+                            for img in images:
+                                upload_result = await _upload_media_async(
+                                    tenant_id=tenant_id,
+                                    execution_id=execution_id,
+                                    media_type="image",
+                                    media_data=img,
+                                    filename="generated_image.png"
+                                )
+                                
+                                if upload_result.get("success"):
+                                    image_urls.append(upload_result["url"])
+                                    uploaded_count += 1
+                            
+                            if uploaded_count > 0:
+                                tasks.append({"task": "Image Generation", "status": "PASSED", "details": f"{uploaded_count} image(s) generated and uploaded"})
+                                logger.info(f"[TASK 4/6] ✓ PASSED - {uploaded_count} image(s) generated and uploaded")
+                            else:
+                                tasks.append({"task": "Image Generation", "status": "FAILED", "details": "Images generated but upload failed"})
+                                logger.warning("[TASK 4/6] ✗ FAILED - Images generated but upload failed")
+                        else:
+                            tasks.append({"task": "Image Generation", "status": "FAILED", "details": image_result.get("error", "Unknown error")})
+                            logger.warning(f"[TASK 4/6] ✗ FAILED - Image generation failed: {image_result.get('error', 'Unknown error')}")
+                    except NotImplementedError as e:
+                        # Image generation not available (e.g., Gemini doesn't support it)
+                        tasks.append({"task": "Image Generation", "status": "SKIPPED", "details": "Not available for current LLM provider"})
+                        logger.warning(f"[TASK 4/6] ⊘ SKIPPED - Image generation not available: {str(e)}")
+                    except Exception as e:
+                        tasks.append({"task": "Image Generation", "status": "FAILED", "details": str(e)})
+                        logger.error(f"[TASK 4/6] ✗ FAILED - Image generation/upload error: {str(e)}")
+                else:
+                    tasks.append({"task": "Image Generation", "status": "SKIPPED", "details": "Not requested"})
+                    logger.info("[TASK 4/6] ⊘ SKIPPED - Image generation not requested")
+                
+                if include_video:
+                    logger.info("[TASK 4/6] Generating video...")
+                    try:
+                        # Use the first platform's content for video generation prompt
+                        video_prompt = user_request
+                        if platform_contents:
+                            first_platform_content = next(iter(platform_contents.values()), "")
+                            if first_platform_content:
+                                video_prompt = first_platform_content[:200]  # Use first 200 chars of generated content
+                        
+                        # Call async helper directly instead of Celery task
+                        video_result = await _generate_video_async(
+                            prompt=video_prompt,
+                            duration_seconds=30
+                        )
+                        
+                        if video_result.get("success"):
+                            video = video_result.get("video")
+                            # Upload video
+                            upload_result = await _upload_media_async(
+                                tenant_id=tenant_id,
+                                execution_id=execution_id,
+                                media_type="video",
+                                media_data=video,
+                                filename="generated_video.mp4"
+                            )
+                            
+                            if upload_result.get("success"):
+                                video_urls.append(upload_result["url"])
+                                tasks.append({"task": "Video Generation", "status": "PASSED", "details": "Video generated and uploaded"})
+                                logger.info("[TASK 4/6] ✓ PASSED - Video generated and uploaded")
+                            else:
+                                tasks.append({"task": "Video Generation", "status": "FAILED", "details": "Video generated but upload failed"})
+                                logger.warning("[TASK 4/6] ✗ FAILED - Video generated but upload failed")
+                        else:
+                            tasks.append({"task": "Video Generation", "status": "FAILED", "details": video_result.get("error", "Unknown error")})
+                            logger.warning(f"[TASK 4/6] ✗ FAILED - Video generation failed: {video_result.get('error', 'Unknown error')}")
+                    except Exception as e:
+                        tasks.append({"task": "Video Generation", "status": "FAILED", "details": str(e)})
+                        logger.error(f"[TASK 4/6] ✗ FAILED - Video generation/upload error: {str(e)}")
+                else:
+                    tasks.append({"task": "Video Generation", "status": "SKIPPED", "details": "Not requested"})
+                    logger.info("[TASK 4/6] ⊘ SKIPPED - Video generation not requested")
+                
+                # Step 5: Post to platforms
+                logger.info("[TASK 5/6] Starting platform posting...")
+                created_content_items = []
+                all_media_urls = image_urls + video_urls
+                posting_passed = 0
+                posting_failed = 0
+                posting_skipped = 0
+                
+                for platform in platforms:
+                    try:
+                        # Get platform-specific content
+                        generated_content = platform_contents.get(platform, "")
+                        if not generated_content:
+                            posting_skipped += 1
+                            logger.warning(f"[TASK 5/6] [{platform}] ⊘ SKIPPED - No content generated for {platform}")
+                            created_content_items.append({
+                                "platform": platform,
+                                "status": "skipped",
+                                "error": "No content generated for this platform"
+                            })
+                            continue
+                        
+                        # Get integration - allow integrations without assistant_id or matching assistant_id
+                        integration_result = await db.execute(
+                            select(SocialIntegration).where(
+                                SocialIntegration.tenant_id == UUID(tenant_id),
+                                (SocialIntegration.assistant_id == UUID(assistant_id)) | (SocialIntegration.assistant_id.is_(None)),
+                                SocialIntegration.platform == platform,
+                                SocialIntegration.is_active == True
+                            )
+                        )
+                        integration = integration_result.scalar_one_or_none()
+                        
+                        if not integration:
+                            posting_skipped += 1
+                            logger.warning(f"[TASK 5/6] [{platform}] ⊘ SKIPPED - No active integration found for {platform}")
+                            created_content_items.append({
+                                "platform": platform,
+                                "status": "skipped",
+                                "error": "No active integration found"
+                            })
+                            continue
+                        
+                        # Build integration data from model fields with comprehensive logging
+                        logger.info(f"[{platform}] Building integration data for posting...")
+                        integration_data = {}
+                        
+                        # Start with meta_data if available
+                        if integration.meta_data:
+                            integration_data.update(integration.meta_data)
+                            logger.debug(f"[{platform}] Loaded meta_data: {list(integration_data.keys())}")
+                        
+                        # Platform-specific parameter extraction
+                        if platform == "facebook":
+                            logger.info(f"[{platform}] Extracting Facebook parameters...")
+                            if not integration.pages:
+                                logger.error(f"[{platform}] Missing pages data in integration")
+                                created_content_items.append({
+                                    "platform": platform,
+                                    "status": "failed",
+                                    "error": "Facebook pages not found in integration"
+                                })
+                                continue
+                            
+                            # Get default page or fall back to first page
+                            from app.services.integration_service import IntegrationService
+                            integration_service = IntegrationService(db)
+                            default_page = await integration_service.get_default_page(integration)
+                            
+                            selected_page = default_page
+                            if not selected_page:
+                                # Fall back to first page if no default is set
+                                selected_page = integration.pages[0] if isinstance(integration.pages, list) and integration.pages else None
+                                logger.info(f"[{platform}] No default page set, using first page")
+                            else:
+                                logger.info(f"[{platform}] Using default page: {selected_page.get('name', 'Unknown')}")
+                            
+                            if selected_page:
+                                integration_data["page_id"] = selected_page.get("id") or selected_page.get("page_id")
+                                integration_data["page_name"] = selected_page.get("name")
+                                # CRITICAL: Use page access token, not user access token
+                                page_access_token = selected_page.get("access_token")
+                                if page_access_token:
+                                    # Override the user access token with page access token
+                                    logger.info(f"[{platform}] Using page access token for posting")
+                                    integration_data["page_access_token"] = page_access_token
+                                else:
+                                    logger.warning(f"[{platform}] Page access token not found, using user token (may fail)")
+                                logger.info(f"[{platform}] Found page_id: {integration_data.get('page_id')}, page_name: {integration_data.get('page_name')}")
+                            else:
+                                logger.error(f"[{platform}] No page data found in pages array")
+                                created_content_items.append({
+                                    "platform": platform,
+                                    "status": "failed",
+                                    "error": "No page data found in integration"
+                                })
+                                continue
+                            
+                            if not integration_data.get("page_id"):
+                                logger.error(f"[{platform}] page_id is missing after extraction")
+                                created_content_items.append({
+                                    "platform": platform,
+                                    "status": "failed",
+                                    "error": "Facebook page_id not found"
+                                })
+                                continue
+                        
+                        elif platform == "instagram":
+                            logger.info(f"[{platform}] Extracting Instagram parameters...")
+                            # Instagram needs ig_user_id from profile_data or meta_data
+                            ig_user_id = None
+                            
+                            # Try from profile_data (stored during OAuth)
+                            if integration.profile_data:
+                                ig_user_id = integration.profile_data.get("id")
+                                logger.debug(f"[{platform}] Found id in profile_data: {ig_user_id}")
+                            
+                            # Try from pages (Instagram Business Account linked to Facebook Page)
+                            if not ig_user_id and integration.pages:
+                                for page in integration.pages if isinstance(integration.pages, list) else []:
+                                    if page.get("instagram_business_account"):
+                                        ig_user_id = page.get("instagram_business_account", {}).get("id")
+                                        logger.debug(f"[{platform}] Found ig_user_id from pages: {ig_user_id}")
+                                        break
+                            
+                            # Try from meta_data
+                            if not ig_user_id:
+                                ig_user_id = integration_data.get("ig_user_id") or integration_data.get("instagram_user_id") or integration_data.get("instagram_business_account_id")
+                                logger.debug(f"[{platform}] Found ig_user_id from meta_data: {ig_user_id}")
+                            
+                            # Try from platform_user_id as last resort
+                            if not ig_user_id and integration.platform_user_id:
+                                ig_user_id = str(integration.platform_user_id)
+                                logger.debug(f"[{platform}] Using platform_user_id as ig_user_id: {ig_user_id}")
+                            
+                            if not ig_user_id:
+                                logger.error(f"[{platform}] ig_user_id not found. profile_data: {integration.profile_data}, pages: {integration.pages}, meta_data keys: {list(integration_data.keys())}, platform_user_id: {integration.platform_user_id}")
+                                created_content_items.append({
+                                    "platform": platform,
+                                    "status": "failed",
+                                    "error": "Instagram user_id not found"
+                                })
+                                continue
+                            
+                            integration_data["ig_user_id"] = str(ig_user_id)
+                            logger.info(f"[{platform}] Found ig_user_id: {ig_user_id}")
+                        
+                        elif platform == "linkedin":
+                            logger.info(f"[{platform}] Extracting LinkedIn parameters...")
+                            entity_id = None
+                            is_organization = False
+                            
+                            # Get default organization or fall back to first organization
+                            from app.services.integration_service import IntegrationService
+                            integration_service = IntegrationService(db)
+                            default_org = await integration_service.get_default_page(integration)
+                            
+                            selected_org = default_org
+                            if not selected_org:
+                                # Fall back to first organization if no default is set
+                                selected_org = integration.organizations[0] if isinstance(integration.organizations, list) and integration.organizations else None
+                                logger.info(f"[{platform}] No default organization set, using first organization")
+                            else:
+                                logger.info(f"[{platform}] Using default organization: {selected_org.get('name', 'Unknown')}")
+                            
+                            if selected_org:
+                                entity_id = selected_org.get("id") or selected_org.get("entity_id") or selected_org.get("organization_id")
+                                is_organization = selected_org.get("is_organization", False)
+                                logger.info(f"[{platform}] Found entity_id from selected organization: {entity_id}, is_organization: {is_organization}")
+                            
+                            # Try from meta_data if still not found
+                            if not entity_id:
+                                entity_id = integration_data.get("entity_id") or integration_data.get("organization_id") or integration_data.get("person_id")
+                                is_organization = integration_data.get("is_organization", False)
+                                logger.info(f"[{platform}] Found entity_id from meta_data: {entity_id}, is_organization: {is_organization}")
+                            
+                            # Try from platform_user_id or platform_name if still not found
+                            if not entity_id:
+                                # LinkedIn entity_id might be stored in platform_user_id
+                                if integration.platform_user_id:
+                                    entity_id = str(integration.platform_user_id)
+                                    logger.info(f"[{platform}] Using platform_user_id as entity_id: {entity_id}")
+                            
+                            if not entity_id:
+                                logger.error(f"[{platform}] entity_id not found. organizations: {integration.organizations}, meta_data keys: {list(integration_data.keys())}, platform_user_id: {integration.platform_user_id}")
+                                created_content_items.append({
+                                    "platform": platform,
+                                    "status": "failed",
+                                    "error": "LinkedIn entity_id not found"
+                                })
+                                continue
+                            
+                            # Clean entity_id - remove URN prefix if present
+                            if isinstance(entity_id, str) and "urn:li:" in entity_id.lower():
+                                # Extract numeric ID from URN like "urn:li:organization:123456" or "urn:li:person:123456"
+                                # Handle nested URNs like "urn:li:person:urn:li:organization:123456"
+                                if "urn:li:organization:" in entity_id.lower():
+                                    # Extract organization ID
+                                    org_part = entity_id.split("urn:li:organization:")[-1]
+                                    entity_id = org_part.split(":")[0] if ":" in org_part else org_part
+                                    is_organization = True
+                                    logger.info(f"[{platform}] Extracted organization entity_id from nested URN: {entity_id}")
+                                elif "urn:li:person:" in entity_id.lower():
+                                    # Extract person ID
+                                    person_part = entity_id.split("urn:li:person:")[-1]
+                                    entity_id = person_part.split(":")[0] if ":" in person_part else person_part
+                                    is_organization = False
+                                    logger.info(f"[{platform}] Extracted person entity_id from nested URN: {entity_id}")
+                                else:
+                                    # Simple URN format
+                                    parts = entity_id.split(":")
+                                    if len(parts) >= 4:
+                                        entity_id = parts[-1]
+                                        is_organization = "organization" in entity_id.lower() or "organization" in str(integration.organizations).lower()
+                                        logger.info(f"[{platform}] Extracted entity_id from URN: {entity_id}, is_organization: {is_organization}")
+                            
+                            integration_data["entity_id"] = str(entity_id)
+                            integration_data["is_organization"] = is_organization
+                            logger.info(f"[{platform}] Final entity_id: {integration_data.get('entity_id')}, is_organization: {integration_data.get('is_organization')}")
+                        
+                        elif platform == "twitter":
+                            logger.info(f"[{platform}] Extracting Twitter parameters...")
+                            # Twitter only needs access_token (bearer token)
+                            if not integration.access_token:
+                                logger.error(f"[{platform}] access_token is missing")
+                                created_content_items.append({
+                                    "platform": platform,
+                                    "status": "failed",
+                                    "error": "Twitter access_token not found"
+                                })
+                                continue
+                            logger.info(f"[{platform}] Access token present: {integration.access_token[:20]}...")
+                        
+                        elif platform == "tiktok":
+                            logger.info(f"[{platform}] Extracting TikTok parameters...")
+                            # TikTok needs access_token and video URL
+                            if not integration.access_token:
+                                logger.error(f"[{platform}] access_token is missing")
+                                created_content_items.append({
+                                    "platform": platform,
+                                    "status": "failed",
+                                    "error": "TikTok access_token not found"
+                                })
+                                continue
+                            
+                            if not all_media_urls or not any(url.endswith(('.mp4', '.mov', '.avi')) for url in all_media_urls):
+                                logger.error(f"[{platform}] No video URL found in media_urls")
+                                created_content_items.append({
+                                    "platform": platform,
+                                    "status": "failed",
+                                    "error": "TikTok requires a video URL"
+                                })
+                                continue
+                            logger.info(f"[{platform}] Access token and video URL present")
+                        
+                        # Validate access token
+                        if not integration.access_token:
+                            logger.error(f"[{platform}] access_token is missing for all platforms")
+                            created_content_items.append({
+                                "platform": platform,
+                                "status": "failed",
+                                "error": "Access token not found"
+                            })
+                            continue
+                        
+                        logger.info(f"[{platform}] All required parameters extracted. Starting post...")
+                        logger.debug(f"[{platform}] Integration data keys: {list(integration_data.keys())}")
+                        
+                        # Post to platform (call async helper directly)
+                        # Use page access token for Facebook if available, otherwise use user token
+                        access_token_to_use = integration.access_token
+                        if platform == "facebook" and integration_data.get("page_access_token"):
+                            access_token_to_use = integration_data["page_access_token"]
+                            logger.info(f"[{platform}] Using page access token for posting")
+                        
+                        post_result = await _post_to_social_platform_async(
+                            platform=platform,
+                            content=generated_content,
+                            access_token=access_token_to_use,
+                            integration_data=integration_data,
+                            media_urls=all_media_urls if all_media_urls else None,
+                            integration=integration,
+                            db_session=db
+                        )
+                        
+                        logger.info(f"[TASK 5/6] [{platform}] Post result: success={post_result.get('success')}, error={post_result.get('error', 'None')}")
+                        
+                        if post_result.get("success"):
+                            # Create content item
+                            content_item = ContentItem(
+                                tenant_id=UUID(tenant_id),
+                                execution_id=UUID(execution_id),
+                                content_type="social_post",
+                                platform=platform,
+                                title=f"Post for {platform}",
+                                content=generated_content,
+                                publish_status="published",
+                                published_at=datetime.now(timezone.utc),
+                                platform_post_id=post_result.get("post_id"),
+                                images=image_urls if image_urls else [],
+                                videos=video_urls if video_urls else [],
+                                meta_data={
+                                    "post_type": post_result.get("post_type", "text"),
+                                    "post_result": post_result
+                                }
+                            )
+                            
+                            db.add(content_item)
+                            posting_passed += 1
+                            logger.info(f"[TASK 5/6] [{platform}] ✓ PASSED - Post published successfully (ID: {post_result.get('post_id', 'N/A')})")
+                            await db.commit()
+                            await db.refresh(content_item)
+                            
+                            created_content_items.append({
+                                "id": str(content_item.id),
+                                "platform": platform,
+                                "post_id": post_result.get("post_id"),
+                                "status": "published"
+                            })
+                        else:
+                            posting_failed += 1
+                            error_msg = post_result.get('error', 'Unknown error')
+                            logger.error(f"[TASK 5/6] [{platform}] ✗ FAILED - Post failed: {error_msg}")
+                            created_content_items.append({
+                                "platform": platform,
+                                "status": "failed",
+                                "error": error_msg
+                            })
+                    
+                    except Exception as e:
+                        posting_failed += 1
+                        logger.error(f"[TASK 5/6] [{platform}] ✗ FAILED - Exception during posting: {str(e)}", exc_info=True)
+                        created_content_items.append({
+                            "platform": platform,
+                            "status": "failed",
+                            "error": str(e)
+                        })
+                
+                # Step 6: Update execution status and log summary
+                logger.info("[TASK 6/6] Finalizing execution...")
+                
+                # Log posting summary
+                if posting_passed > 0 or posting_failed > 0 or posting_skipped > 0:
+                    tasks.append({
+                        "task": "Platform Posting",
+                        "status": "PARTIAL" if (posting_failed > 0 or posting_skipped > 0) else "PASSED",
+                        "details": f"{posting_passed} passed, {posting_failed} failed, {posting_skipped} skipped"
+                    })
+                    logger.info(f"[TASK 5/6] Platform posting summary: {posting_passed} passed, {posting_failed} failed, {posting_skipped} skipped")
+                
+                # Calculate task summary
+                passed_count = sum(1 for t in tasks if t["status"] == "PASSED")
+                failed_count = sum(1 for t in tasks if t["status"] == "FAILED")
+                skipped_count = sum(1 for t in tasks if t["status"] == "SKIPPED")
+                partial_count = sum(1 for t in tasks if t["status"] == "PARTIAL")
+                total_tasks = len(tasks)
+                
+                # Log final summary
+                logger.info("=" * 80)
+                logger.info("CONTENT CREATION EXECUTION SUMMARY")
+                logger.info("=" * 80)
+                logger.info(f"Total Tasks: {total_tasks}")
+                logger.info(f"✓ Passed: {passed_count}")
+                logger.info(f"✗ Failed: {failed_count}")
+                logger.info(f"⊘ Skipped: {skipped_count}")
+                logger.info(f"⚠ Partial: {partial_count}")
+                logger.info("")
+                logger.info("Task Details:")
+                for i, task in enumerate(tasks, 1):
+                    status_symbol = "✓" if task["status"] == "PASSED" else "✗" if task["status"] == "FAILED" else "⊘" if task["status"] == "SKIPPED" else "⚠"
+                    logger.info(f"  {i}. {status_symbol} {task['task']}: {task['status']} - {task['details']}")
+                logger.info("=" * 80)
+                
+                # Get the first successful content or first platform content for summary
+                summary_content = ""
+                for platform in platforms:
+                    if platform in platform_contents and platform_contents[platform]:
+                        summary_content = platform_contents[platform]
+                        break
+                
+                await execution_service.update_execution(
+                    execution_id=UUID(execution_id),
+                    status="completed",
+                    result={
+                        "content": summary_content,
+                        "platform_contents": platform_contents,
+                        "content_items": created_content_items,
+                        "images_generated": len(image_urls),
+                        "videos_generated": len(video_urls),
+                        "platforms_posted": [item["platform"] for item in created_content_items if item.get("status") == "published"],
+                        "task_summary": {
+                            "total_tasks": total_tasks,
+                            "passed": passed_count,
+                            "failed": failed_count,
+                            "skipped": skipped_count,
+                            "partial": partial_count,
+                            "tasks": tasks
+                        }
+                    },
+                    steps_executed=[],
+                    tools_used=[]
+                )
+                
+                logger.info("[TASK 6/6] ✓ PASSED - Execution completed and status updated")
+                
+                return {
+                    "success": True,
+                    "execution_id": execution_id,
+                    "content_items": created_content_items,
+                    "platform_contents": platform_contents,
+                    "content": summary_content
+                }
+            finally:
+                await db.close()
+        
+        result = loop.run_until_complete(_execute())
+        loop.close()
+        return result
+    
+    except Exception as e:
+        logger.error(f"Content creation execution failed: {str(e)}")
+        
+        # Update execution status
+        try:
+            # Create a new event loop for this task
+            try:
+                update_loop = asyncio.get_event_loop()
+                if update_loop.is_closed():
+                    update_loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(update_loop)
+            except RuntimeError:
+                update_loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(update_loop)
+            
+            async def _update():
+                from app.db.session import create_worker_session_factory
+                from app.services.agent_execution_service import AgentExecutionService
+                
+                # Create a new session factory for this worker task
+                SessionFactory = create_worker_session_factory()
+                db = SessionFactory()
+                try:
+                    execution_service = AgentExecutionService(db)
+                    await execution_service.update_execution(
+                        execution_id=UUID(execution_id),
+                        status="failed",
+                        error_message=str(e)
+                    )
+                finally:
+                    await db.close()
+            
+            update_loop.run_until_complete(_update())
+            update_loop.close()
+        except Exception as update_error:
+            logger.error(f"Failed to update execution status: {str(update_error)}")
+        
+        raise self.retry(exc=e, countdown=120)
+
