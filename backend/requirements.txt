@@ -1,0 +1,75 @@
+# FastAPI and web framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+
+# Authentication
+python-jose[cryptography]==3.3.0
+bcrypt==4.1.2
+
+# Pydantic
+pydantic==2.5.0
+pydantic-settings==2.1.0
+email-validator>=2.0.0
+
+# Redis
+redis==5.0.1
+hiredis==2.2.3
+
+# Celery
+celery==5.3.4
+
+# Storage (S3)
+boto3==1.29.7
+
+# File handling
+aiofiles==23.2.1
+Pillow==10.2.0  # For image processing in Gemini image generation
+
+# Utilities
+python-slugify==8.0.1
+
+# Stripe
+stripe==7.0.0
+
+# HTTP client
+httpx==0.25.1
+
+# Google Ads API and dependencies
+google-ads==28.2.0
+google-api-python-client>=2.0.0
+google-auth>=2.0.0
+google-auth-oauthlib>=0.4.6
+google-auth-httplib2>=0.1.0
+
+# LLM Providers
+google-generativeai==0.3.2  # Gemini (legacy API for content generation - compatible with langchain-google-genai)
+google-genai>=1.0.0  # New Google GenAI SDK (for image generation with imagen-4.0)
+openai==1.12.0  # OpenAI
+anthropic==0.18.1  # Anthropic Claude
+
+# LangChain for agent orchestration
+langchain==0.1.0
+langchain-core==0.1.8
+langchain-community==0.0.10
+chromadb==0.4.22
+PyPDF2==3.0.1
+python-docx==1.1.0
+beautifulsoup4==4.12.2
+langchain-openai==0.0.2
+langchain-google-genai==0.0.6  # Requires google-generativeai<0.4.0
+langchain-anthropic==0.1.0
+langgraph==0.0.20
+
+# SerpAPI for SEO and keyword research
+google-search-results==2.4.2
+
+# Celery monitoring
+flower==2.0.1  # Celery monitoring
+
