@@ -483,7 +483,7 @@ export default function ContentPage() {
                           {execution.result?.content?.substring(0, 50) || "Content Creation"}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {execution.status} • {new Date(execution.created_at).toLocaleString()}
+                          {execution.status} • {execution.created_at ? new Date(execution.created_at).toLocaleString() : 'N/A'}
                         </p>
                         {execution.steps_executed && execution.steps_executed.length > 0 && (
                           <p className="text-xs text-muted-foreground mt-1">

@@ -18,8 +18,12 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<AuthUser> {
     const response = await apiClient.login(email, password);
-    this.user = response.user;
-    return this.user;
+    if (!response.user) {
+      throw new Error('Login failed: No user data received');
+    }
+    const user = response.user;
+    this.user = user;
+    return user;
   }
 
   async register(userData: {

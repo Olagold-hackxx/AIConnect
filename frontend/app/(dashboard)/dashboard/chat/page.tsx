@@ -73,7 +73,6 @@ export default function ChatPage() {
       await apiClient.streamChat(
         selectedAssistant,
         input,
-        sessionId || undefined,
         (chunk) => {
           assistantMessage += chunk
           setMessages((prev) => {
@@ -83,7 +82,8 @@ export default function ChatPage() {
             }
             return [...prev, { role: "assistant" as const, content: assistantMessage }]
           })
-        }
+        },
+        sessionId || undefined
       )
 
       // Update session ID if we got one from the response

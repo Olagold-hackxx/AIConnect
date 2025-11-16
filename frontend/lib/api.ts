@@ -1,6 +1,8 @@
 /**
  * API client for CODIAN backend
  */
+import type { AuthUser } from './auth';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const API_VERSION = '/api/v1';
 
@@ -108,8 +110,8 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${API_VERSION}${endpoint}`;
-    const headers: HeadersInit = {
-      ...options.headers,
+    const headers: Record<string, string> = {
+      ...(options.headers as Record<string, string> || {}),
     };
 
     // Only set Content-Type for non-GET requests with body
@@ -165,20 +167,20 @@ class ApiClient {
     full_name?: string;
     tenant_id: string;
     role?: string;
-  }) {
-    return this.request('/auth/register', {
+  }): Promise<AuthUser> {
+    return this.request<AuthUser>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
   }
 
-  async getCurrentUser() {
-    return this.request('/auth/me');
+  async getCurrentUser(): Promise<AuthUser> {
+    return this.request<AuthUser>('/auth/me');
   }
 
   // Tenant endpoints
-  async getTenant() {
-    return this.request('/tenants/me');
+  async getTenant(): Promise<{ name?: string; website?: string; [key: string]: any }> {
+    return this.request<{ name?: string; website?: string; [key: string]: any }>('/tenants/me');
   }
 
   async updateTenant(data: any) {
@@ -225,8 +227,8 @@ class ApiClient {
   async streamChat(
     assistantId: string,
     message: string,
-    sessionId?: string,
-    onChunk: (chunk: string) => void
+    onChunk: (chunk: string) => void,
+    sessionId?: string
   ) {
     const url = `${this.baseUrl}${API_VERSION}/chat/stream`;
     const headers: HeadersInit = {
@@ -280,7 +282,7 @@ class ApiClient {
     }
   }
 
-  async listConversations(assistantId?: string, limit = 50, offset = 0) {
+  async listConversations(assistantId?: string, limit = 50, offset = 0): Promise<{ conversations?: any[]; total?: number }> {
     const params = new URLSearchParams({
       limit: limit.toString(),
       offset: offset.toString(),
@@ -288,7 +290,7 @@ class ApiClient {
     if (assistantId) {
       params.append('assistant_id', assistantId);
     }
-    return this.request(`/chat/conversations?${params}`);
+    return this.request<{ conversations?: any[]; total?: number }>(`/chat/conversations?${params}`);
   }
 
   async getConversation(conversationId: string) {
@@ -327,7 +329,7 @@ class ApiClient {
     return response.json();
   }
 
-  async listDocuments(assistantId?: string, status?: string, limit = 50, offset = 0) {
+  async listDocuments(assistantId?: string, status?: string, limit = 50, offset = 0): Promise<{ documents?: any[]; total?: number }> {
     const params = new URLSearchParams({
       limit: limit.toString(),
       offset: offset.toString(),
@@ -338,7 +340,7 @@ class ApiClient {
     if (status) {
       params.append('status', status);
     }
-    return this.request(`/documents?${params}`);
+    return this.request<{ documents?: any[]; total?: number }>(`/documents?${params}`);
   }
 
   // Billing endpoints
@@ -379,12 +381,12 @@ class ApiClient {
     return this.request(`/integrations/status${params}`);
   }
 
-  async listIntegrations(assistantId?: string, platform?: string) {
+  async listIntegrations(assistantId?: string, platform?: string): Promise<{ integrations?: any[]; total?: number }> {
     const params = new URLSearchParams();
     if (assistantId) params.append('assistant_id', assistantId);
     if (platform) params.append('platform', platform);
     const query = params.toString() ? `?${params}` : '';
-    return this.request(`/integrations${query}`);
+    return this.request<{ integrations?: any[]; total?: number }>(`/integrations${query}`);
   }
 
   async getIntegration(integrationId: string) {
@@ -542,11 +544,11 @@ class ApiClient {
     });
   }
 
-  async listScheduledPosts(assistantId?: string, isActive?: boolean) {
+  async listScheduledPosts(assistantId?: string, isActive?: boolean): Promise<{ scheduled_posts?: any[] }> {
     const params = new URLSearchParams();
     if (assistantId) params.append('assistant_id', assistantId);
     if (isActive !== undefined) params.append('is_active', isActive.toString());
-    return this.request(`/scheduled-posts?${params}`);
+    return this.request<{ scheduled_posts?: any[] }>(`/scheduled-posts?${params}`);
   }
 
   async getScheduledPost(scheduledPostId: string) {
