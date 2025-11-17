@@ -42,7 +42,23 @@ def get_redis_client():
     if _redis_client is None:
         try:
             import redis
-            _redis_client = redis.from_url(settings.REDIS_URL) if settings.REDIS_URL else None
+            import ssl
+            if not settings.REDIS_URL:
+                _redis_client = False
+                return None
+            
+            # Dynamically build the Redis configuration
+            # Check if URL uses rediss:// or if REDIS_USE_SSL is set
+            use_ssl = settings.REDIS_USE_SSL or settings.REDIS_URL.startswith('rediss://')
+            
+            # Only include SSL settings if SSL is required
+            if use_ssl:
+                _redis_client = redis.from_url(
+                    settings.REDIS_URL,
+                    ssl_cert_reqs=ssl.CERT_NONE
+                )
+            else:
+                _redis_client = redis.from_url(settings.REDIS_URL)
         except ImportError:
             logger.warning("Redis not installed, OAuth state will not be persisted")
             _redis_client = False

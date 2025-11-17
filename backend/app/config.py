@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_USE_SSL: bool = False  # Set to True if Redis requires SSL
     REDIS_SESSION_PREFIX: str = "session:"
     REDIS_CACHE_TTL: int = 3600
     
@@ -125,6 +126,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"  # Ignore extra environment variables (like PORT from Render)
 
 
 settings = Settings()
