@@ -15,6 +15,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Copy and make startup script executable
+COPY wait-for-db.sh /app/wait-for-db.sh
+RUN chmod +x /app/wait-for-db.sh
+
 # Default command (can be overridden in docker-compose)
-CMD ["celery", "-A", "app.workers", "worker", "--loglevel=info"]
+CMD ["/app/wait-for-db.sh", "celery", "-A", "app.workers", "worker", "--loglevel=info"]
 
