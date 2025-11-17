@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/codian"
     DATABASE_ECHO: bool = False
+    DATABASE_SSL_REQUIRED: bool = False  # Set to True in production
+    DATABASE_SSL_CA: Optional[str] = None  # Path to CA certificate file or content from env
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"

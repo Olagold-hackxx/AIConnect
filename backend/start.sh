@@ -29,6 +29,15 @@ done
 
 echo "Database is ready!"
 
+# Handle SSL CA certificate if provided
+if [ -n "$DATABASE_SSL_CA" ] && [ ! -f "$DATABASE_SSL_CA" ]; then
+  # If DATABASE_SSL_CA is not a file path, treat it as certificate content
+  # Write it to a temporary file
+  echo "$DATABASE_SSL_CA" > /tmp/postgres-ca.crt
+  export DATABASE_SSL_CA=/tmp/postgres-ca.crt
+  echo "SSL CA certificate written to /tmp/postgres-ca.crt"
+fi
+
 # Run migrations
 echo "Running database migrations..."
 alembic upgrade head

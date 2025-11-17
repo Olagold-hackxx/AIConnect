@@ -66,4 +66,8 @@ Thumbs.db
 
 
 # ChromaDB
-chroma_db/*
+chroma_db/
+
+# SSL certificates
+/tmp/postgres-ca.crt
+postgres-ca.crt*
