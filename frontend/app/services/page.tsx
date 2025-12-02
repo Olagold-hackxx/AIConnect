@@ -1,99 +1,166 @@
 import { PageLayout } from "@/components/shared/page-layout"
 import { PageHeader } from "@/components/shared/page-header"
 import { AIPersonas3D } from "@/components/landing/ai-personas-3d"
-import { 
-  User, 
-  Settings, 
-  Zap, 
-  Brain, 
-  Monitor, 
-  RefreshCw, 
-  HeadphonesIcon,
-  CheckCircle2
-} from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { CheckCircle2, HeadphonesIcon, Sparkles, Target, Users } from "lucide-react"
+import Link from "next/link"
 
 export default function ServicesPage() {
   return (
     <PageLayout>
       <PageHeader
-        title="Our Human-Enabled AI Automation Services"
-        description="AI agents powered by human support - specialized AI assistants managed and deployed by our expert human managers."
+        title="AI Employees Built for Real Business Work"
+        description="Choose the AI role you need — each one comes with a human persona, specialised workflows, and industry-trained capabilities. All roles include a free 7-day trial and setup guidance."
       />
 
       <div className="py-16">
+        {/* Personas / Meet Your AI Team */}
         <AIPersonas3D />
 
-        {/* Service Details */}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-20">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-3xl font-bold">What's Included with Human-Enabled AI Automation</h2>
+        {/* Core Roles */}
+        <div className="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold">Choose the AI Role You Need</h2>
             <p className="text-lg text-muted-foreground">
-              Every AI assistant comes with comprehensive setup, ongoing management, and dedicated human support. 
-              Our AI agents powered by human expertise ensure your tasks are executed effectively.
+              Deploy AI employees that talk, think, and work like real team members — without the hiring headaches.
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {/* Personal Account Manager - Centered in last row */}
-            <div className="rounded-xl border border-border/40 bg-card p-6 ">
-              <User className="mb-4 h-8 w-8 text-primary" />
-              <h3 className="mb-2 text-xl font-semibold">Dedicated Human Manager</h3>
-              <p className="text-sm text-muted-foreground">
-                Your dedicated human manager ensures your AI assistants execute tasks effectively. They handle everything from 
-                initial consultation to ongoing management, optimization, and strategic guidance. This human-enabled approach 
-                guarantees quality and alignment with your business goals.
-              </p>
-            </div> 
-            <div className="rounded-xl border border-border/40 bg-card p-6">
-              <Settings className="mb-4 h-8 w-8 text-primary" />
-              <h3 className="mb-2 text-xl font-semibold">Custom Configuration</h3>
-              <p className="text-sm text-muted-foreground">
-                We tailor each AI assistant to your specific business needs, workflows, and brand voice.
-              </p>
-            </div>
+          <div className="grid gap-8 md:grid-cols-2">
+            <Card className="h-full">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                  <Sparkles className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle>AI Digital Marketer</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>Handles day-to-day marketing so you can focus on strategy.</p>
+                <ul className="space-y-1">
+                  <li>• Social media posting</li>
+                  <li>• Content creation</li>
+                  <li>• Ad ideas &amp; scripts</li>
+                  <li>• SEO content</li>
+                  <li>• Email marketing</li>
+                </ul>
+                <Button className="mt-4 w-full ai-gradient" asChild>
+                  <Link href="/pricing">Deploy AI Marketer (7-Day Free Trial)</Link>
+                </Button>
+              </CardContent>
+            </Card>
 
-            <div className="rounded-xl border border-border/40 bg-card p-6">
-              <Zap className="mb-4 h-8 w-8 text-secondary" />
-              <h3 className="mb-2 text-xl font-semibold">Seamless Integration</h3>
-              <p className="text-sm text-muted-foreground">
-                Our team handles all technical integration with your existing tools and platforms.
-              </p>
-            </div>
+            <Card className="h-full">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10">
+                  <HeadphonesIcon className="h-6 w-6 text-secondary" />
+                </div>
+                <CardTitle>AI Customer Support Agent</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>Delivers friendly, human-like support around the clock.</p>
+                <ul className="space-y-1">
+                  <li>• 24/7 responses</li>
+                  <li>• Human-like conversation</li>
+                  <li>• Ticket handling</li>
+                  <li>• Order updates &amp; customer nurturing</li>
+                  <li>• Complaint resolution</li>
+                </ul>
+                <Button className="mt-4 w-full ai-gradient" asChild>
+                  <Link href="/pricing">Deploy AI Support Agent (Free Trial)</Link>
+                </Button>
+              </CardContent>
+            </Card>
 
-            <div className="rounded-xl border border-border/40 bg-card p-6">
-              <Brain className="mb-4 h-8 w-8 text-accent" />
-              <h3 className="mb-2 text-xl font-semibold">Training & Optimization</h3>
-              <p className="text-sm text-muted-foreground">
-                Continuous training on your data to improve accuracy and performance over time.
-              </p>
-            </div>
+            <Card className="h-full">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
+                  <Users className="h-6 w-6 text-accent" />
+                </div>
+                <CardTitle>AI Executive Assistant</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>Organised, detail-oriented support for your schedule and ops.</p>
+                <ul className="space-y-1">
+                  <li>• Calendar management</li>
+                  <li>• Email drafting</li>
+                  <li>• Research &amp; reminders</li>
+                  <li>• Document creation</li>
+                  <li>• Task management</li>
+                </ul>
+                <Button className="mt-4 w-full ai-gradient" asChild>
+                  <Link href="/pricing">Deploy AI Executive Assistant (Free Trial)</Link>
+                </Button>
+              </CardContent>
+            </Card>
 
-            <div className="rounded-xl border border-border/40 bg-card p-6">
-              <Monitor className="mb-4 h-8 w-8 text-primary" />
-              <h3 className="mb-2 text-xl font-semibold">24/7 Monitoring</h3>
-              <p className="text-sm text-muted-foreground">
-                Round-the-clock monitoring to ensure optimal performance and quick issue resolution.
-              </p>
-            </div>
+            <Card className="h-full">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                  <Target className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle>AI Business Development Rep</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>Confident, professional outreach that keeps your pipeline full.</p>
+                <ul className="space-y-1">
+                  <li>• Lead generation</li>
+                  <li>• Personalised outreach</li>
+                  <li>• Follow-ups &amp; pipeline management</li>
+                  <li>• Sales call prep</li>
+                </ul>
+                <Button className="mt-4 w-full ai-gradient" asChild>
+                  <Link href="/pricing">Deploy AI Business Development Rep (Free Trial)</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
-            <div className="rounded-xl border border-border/40 bg-card p-6">
-              <RefreshCw className="mb-4 h-8 w-8 text-secondary" />
-              <h3 className="mb-2 text-xl font-semibold">Regular Updates</h3>
-              <p className="text-sm text-muted-foreground">
-                Automatic updates with the latest AI models and features at no extra cost.
-              </p>
-            </div>
+        {/* Custom AI & Free Audit */}
+        <div className="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-2">
+            <Card className="h-full">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                  <Sparkles className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle>Custom AI Employees</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>
+                  Have a unique workflow or role in mind? We’ll build a custom AI worker trained specifically for your
+                  processes, tools, and playbooks.
+                </p>
+                <Button className="mt-4 w-full ai-gradient" asChild>
+                  <Link href="/contact">Build a Custom AI Employee</Link>
+                </Button>
+              </CardContent>
+            </Card>
 
-            <div className="rounded-xl border border-border/40 bg-card p-6 md:col-start-1 md:col-end-3 lg:col-start-2 lg:col-end-3">
-              <HeadphonesIcon className="mb-4 h-8 w-8 text-accent" />
-              <h3 className="mb-2 text-xl font-semibold">Human-Enabled Support</h3>
-              <p className="text-sm text-muted-foreground">
-                Direct access to our AI automation specialists and human managers for questions, adjustments, and strategic 
-                guidance. Our human-enabled AI assistants come with expert human support to ensure optimal performance.
-              </p>
-            </div>
-
-          
+            <Card className="h-full">
+              <CardHeader>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10">
+                  <CheckCircle2 className="h-6 w-6 text-secondary" />
+                </div>
+                <CardTitle>Free Business Efficiency Audit</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>
+                  Not sure which AI employee you need? Get a free business audit to identify your best role, biggest
+                  savings, and highest-impact workflows.
+                </p>
+                <ul className="space-y-1">
+                  <li>✓ Efficiency score</li>
+                  <li>✓ Savings estimate</li>
+                  <li>✓ Role recommendation</li>
+                  <li>✓ Workflow suggestions</li>
+                </ul>
+                <Button className="mt-4 w-full ai-gradient" asChild>
+                  <Link href="/contact">Book Free Audit</Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

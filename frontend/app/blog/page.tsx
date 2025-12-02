@@ -6,65 +6,73 @@ import Link from "next/link"
 import { ArrowRight, Calendar, Clock } from "lucide-react"
 
 export const metadata = {
-  title: "Blog - Human-Enabled AI Automation, AI Agents, and Business AI Insights | CODIAN",
-  description: "Explore articles about human-enabled AI assistants, AI automation, AI agents powered by human support, AI personas, business automation, and more. Learn how to leverage AI automation with human expertise.",
-  keywords: "human-enabled AI assistant, AI agent powered by human, AI automation, AI personas, human-enabled AI automation, AI automation blog, business AI automation, AI assistants with human support, AI automation services, AI automation strategy",
+  title: "StaffPilot Blog — Scale Smarter With AI Employees",
+  description:
+    "Guides, strategies, and insights on using AI employees to grow your business. Learn how to cut costs, scale operations, and build an AI-powered team with StaffPilot.",
+  keywords:
+    "StaffPilot blog, AI employees, AI staffing, AI assistants, AI for business, AI lead generation, AI customer support, future of work",
 }
 
 const blogPosts = [
   {
     id: 1,
-    title: "Why Human-Enabled AI Automation Outperforms Pure AI Solutions",
-    excerpt: "Discover how AI agents powered by human expertise deliver better results than pure AI automation. Learn why businesses choose human-enabled AI assistants for critical operations.",
-    date: "2024-01-15",
-    readTime: "5 min read",
-    slug: "why-human-enabled-ai-automation",
-    keywords: "human-enabled AI automation, AI agent powered by human, AI automation benefits",
+    title: "Top 10 Tasks Every Business Should Automate in 2025",
+    excerpt:
+      "From support to marketing, discover the high-leverage tasks your AI employee should be handling for you this year.",
+    date: "2025-01-05",
+    readTime: "8 min read",
+    slug: "top-10-tasks-to-automate-2025",
+    keywords: "AI automation, AI employees, business automation",
   },
   {
     id: 2,
-    title: "The Future of Business: AI Personas with Dedicated Human Managers",
-    excerpt: "Explore how combining AI personas with dedicated human managers creates a powerful business automation solution. Learn how human-enabled AI assistants transform operations.",
-    date: "2024-01-10",
+    title: "How AI Employees Cut Costs by 90%",
+    excerpt:
+      "See the real math behind replacing or augmenting traditional roles with AI employees — and where the biggest savings come from.",
+    date: "2024-12-15",
     readTime: "7 min read",
-    slug: "ai-personas-human-managers",
-    keywords: "AI personas, dedicated human manager, human-enabled AI assistant",
+    slug: "how-ai-employees-cut-costs",
+    keywords: "AI cost savings, AI vs payroll, StaffPilot pricing",
   },
   {
     id: 3,
-    title: "Complete Guide to AI Automation: From Setup to Optimization",
-    excerpt: "A comprehensive guide to implementing AI automation in your business. Learn about AI automation services, best practices, and how human-enabled AI can accelerate your results.",
-    date: "2024-01-05",
-    readTime: "10 min read",
-    slug: "complete-guide-ai-automation",
-    keywords: "AI automation, AI automation services, business AI automation",
+    title: "The Future of Work: Why AI Staff Will Replace Remote Assistants",
+    excerpt:
+      "Remote assistants changed how we work. AI employees are the next leap — always-on, infinitely scalable, and far more affordable.",
+    date: "2024-11-20",
+    readTime: "9 min read",
+    slug: "future-of-work-ai-staff",
+    keywords: "future of work, AI staff, remote assistants",
   },
   {
     id: 4,
-    title: "AI Agents Powered by Human: The Hybrid Approach to Business Automation",
-    excerpt: "Understanding the benefits of AI agents powered by human support. See how this human-enabled approach combines efficiency with quality assurance and strategic insight.",
-    date: "2024-01-01",
+    title: "AI vs Human Assistants: The Real Cost Comparison",
+    excerpt:
+      "A side-by-side breakdown of salary, benefits, ramp time, and output between traditional assistants and AI employees.",
+    date: "2024-10-01",
     readTime: "6 min read",
-    slug: "ai-agents-powered-by-human",
-    keywords: "AI agent powered by human, human-enabled AI automation, AI assistants with human support",
+    slug: "ai-vs-human-assistants",
+    keywords: "AI vs human, assistant comparison, AI ROI",
   },
   {
     id: 5,
-    title: "How Dedicated Human Managers Make AI Automation More Effective",
-    excerpt: "Learn why dedicated human managers are essential for successful AI automation. Discover how human-enabled AI assistants benefit from expert oversight and strategic guidance.",
-    date: "2023-12-28",
+    title: "How to Use AI to Generate Leads on Autopilot",
+    excerpt:
+      "Turn your AI employee into a 24/7 outbound engine that finds, warms, and nurtures leads while you sleep.",
+    date: "2024-09-10",
     readTime: "8 min read",
-    slug: "dedicated-human-managers-ai-automation",
-    keywords: "dedicated human manager, human-enabled AI automation, AI automation effectiveness",
+    slug: "ai-lead-generation-autopilot",
+    keywords: "AI lead generation, sales automation, BD AI",
   },
   {
     id: 6,
-    title: "Scaling Your Business with AI Automation and Human Support",
-    excerpt: "Discover strategies for scaling operations using AI automation services backed by human expertise. Learn how AI personas and human managers work together for growth.",
-    date: "2023-12-25",
-    readTime: "9 min read",
-    slug: "scaling-business-ai-automation",
-    keywords: "AI automation, business scaling, AI personas, human-enabled AI",
+    title: "The Ultimate Guide to Hiring an AI Employee",
+    excerpt:
+      "Everything you need to know before deploying your first AI employee — from role selection to onboarding and KPIs.",
+    date: "2024-08-01",
+    readTime: "12 min read",
+    slug: "ultimate-guide-hiring-ai-employee",
+    keywords: "hire AI employee, StaffPilot guide, AI onboarding",
   },
 ]
 
@@ -72,32 +80,28 @@ export default function BlogPage() {
   return (
     <PageLayout>
       <PageHeader
-        title="Blog"
-        description="Insights on Human-Enabled AI Automation, AI Agents, and Business AI"
+        title="Scale Smarter With AI"
+        description="Guides, strategies, and insights on using AI employees to grow your business."
       />
-      
+
       <div className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* SEO Content Section */}
           <div className="mb-16 rounded-2xl border border-border/50 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 p-8 sm:p-12">
-            <h2 className="mb-4 text-3xl font-bold">
-              Human-Enabled AI Automation: Your Guide to AI Agents Powered by Human Support
-            </h2>
+            <h2 className="mb-4 text-3xl font-bold">StaffPilot Insights: Building Your AI-Powered Team</h2>
             <div className="space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed">
-                Welcome to the CODIAN blog, your resource for insights on human-enabled AI automation, AI agents powered 
-                by human expertise, and AI automation strategies. We explore how combining AI personas with dedicated human 
-                managers creates powerful business automation solutions that deliver real results.
+                Welcome to the StaffPilot blog — your hub for learning how AI employees can take over marketing,
+                support, operations, and more so you can focus on growth.
               </p>
               <p className="text-lg leading-relaxed">
-                Our articles cover topics including human-enabled AI assistants, AI automation services, AI automation 
-                best practices, and how businesses leverage AI automation effectively. Whether you're exploring AI automation 
-                for the first time or looking to optimize your existing AI assistants, you'll find valuable insights here.
+                Here, we break down real-world use cases, cost comparisons, and playbooks for deploying AI employees
+                inside modern businesses. Whether you’re hiring your first AI employee or scaling a fully AI-supported
+                team, you’ll find practical guidance you can apply today.
               </p>
               <p className="text-lg leading-relaxed">
-                Learn how AI agents powered by human support outperform pure AI automation, why dedicated human managers are 
-                essential for AI automation success, and discover strategies for implementing human-enabled AI automation 
-                in your business. Explore the intersection of AI automation technology and human expertise.
+                Explore topics like automating repetitive tasks, building always-on lead generation, turning support
+                into a 24/7 function, and designing workflows that combine AI precision with human judgment.
               </p>
             </div>
           </div>
@@ -112,7 +116,13 @@ export default function BlogPage() {
                     <div className="mb-4 flex items-center gap-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        <span>{new Date(post.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                        <span>
+                          {new Date(post.date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
@@ -141,48 +151,48 @@ export default function BlogPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Human-Enabled AI Automation</CardTitle>
+                  <CardTitle className="text-lg">AI Employees &amp; Automation</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription>
-                    Learn how human-enabled AI automation combines AI technology with human expertise for better results. 
-                    Discover why AI agents powered by human support outperform pure automation.
+                    Learn how to delegate marketing, support, and operations to AI employees so your team can focus on
+                    high-leverage work.
                   </CardDescription>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">AI Agents Powered by Human</CardTitle>
+                  <CardTitle className="text-lg">Cost &amp; ROI</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription>
-                    Explore the benefits of AI agents powered by human expertise. See how dedicated human managers 
-                    enhance AI automation effectiveness and deliver business value.
+                    Deep dives into how AI employees cut costs by up to 90% compared to traditional hires — with real
+                    numbers and scenarios.
                   </CardDescription>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">AI Personas & Automation</CardTitle>
+                  <CardTitle className="text-lg">Lead Gen &amp; Sales</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription>
-                    Discover how AI personas work alongside human support to automate business processes. Learn about 
-                    AI automation services and implementation strategies.
+                    Playbooks for turning AI into a 24/7 outbound engine that books calls, warms leads, and supports
+                    your sales team.
                   </CardDescription>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Dedicated Human Managers</CardTitle>
+                  <CardTitle className="text-lg">Future of Work</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription>
-                    Understand the role of dedicated human managers in AI automation. Learn how human-enabled AI assistants 
-                    benefit from expert oversight and strategic guidance.
+                    Perspectives on how AI staff will reshape hiring, remote work, and what “team” means in the next
+                    decade.
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -191,14 +201,19 @@ export default function BlogPage() {
 
           {/* CTA Section */}
           <div className="rounded-2xl border border-border/50 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 p-8 text-center sm:p-12">
-            <h2 className="mb-4 text-3xl font-bold">Ready to Implement Human-Enabled AI Automation?</h2>
+            <h2 className="mb-4 text-3xl font-bold">Ready to Hire Your First AI Employee?</h2>
             <p className="mb-8 mx-auto max-w-2xl text-lg text-muted-foreground">
-              Experience the power of AI agents powered by human support. Get started with CODIAN's human-enabled 
-              AI assistants today and transform your business operations.
+              Try a live demo, see your AI employee in action, and start a free 7-day trial to experience the impact on
+              your business.
             </p>
-            <Button size="lg" className="ai-gradient" asChild>
-              <Link href="/signup">Get Started</Link>
-            </Button>
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button size="lg" className="ai-gradient" asChild>
+                <Link href="/contact">Get Your Free AI Employee Demo</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/pricing">Start Free 7-Day Trial</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>

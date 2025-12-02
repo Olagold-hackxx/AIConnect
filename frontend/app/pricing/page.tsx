@@ -12,51 +12,52 @@ import { Label } from "@/components/ui/label"
 
 const pricingPlans = [
   {
-    id: "starter",
-    name: "Starter Plan",
-    price: "$500",
-    period: "one-time setup",
-    description: "Perfect for businesses starting with AI automation",
+    id: "self-setup",
+    name: "Tier 1 — Self-Setup",
+    price: "$59–$149",
+    period: "month",
+    description: "For DIY founders and fast executors.",
     features: [
-      "All 3 AI Assistants",
-      "Uptime guarantee",
-      "Basic setup and configuration",
+      "Full AI employee",
+      "Templates & workflows",
+      "Personas included",
+      "Unlimited tasks",
       "Email support",
-      "No ongoing support included",
+      "7-day free trial included",
     ],
     popular: false,
   },
   {
-    id: "professional",
-    name: "Professional Plan",
-    price: "$600",
-    period: "per month",
-    description: "Ideal for businesses needing AI automation with human manager support",
+    id: "managed",
+    name: "Tier 2 — Managed",
+    price: "$299–$599",
+    period: "month",
+    description: "We set up, optimise, and improve everything weekly.",
     features: [
-      "All 3 AI Assistants",
-      "Uptime guarantee",
-      "Human manager with great support",
+      "Everything in Self-Setup",
+      "Human account manager",
+      "Weekly improvements",
+      "Monthly analytics reports",
       "Priority support",
-      "Custom integration setup",
-      "Advanced analytics",
+      "Personalised optimisation",
+      "7-day free trial included",
     ],
     popular: true,
   },
   {
-    id: "enterprise",
-    name: "Enterprise Plan",
-    price: "$1000",
-    period: "per month",
-    description: "Complete AI automation with fully dedicated human manager",
+    id: "dedicated",
+    name: "Tier 3 — Dedicated Manager",
+    price: "$1,500–$4,000",
+    period: "month",
+    description: "Your own human expert + AI employee. Full-time support and pro-level automation.",
     features: [
-      "All 3 AI Assistants",
-      "Uptime guarantee",
-      "Fully dedicated human manager",
-      "Option to hire your manager",
-      "24/7 premium support",
-      "Full custom integration",
-      "Advanced analytics & reporting",
-      "Custom AI training on your data",
+      "Everything in Managed",
+      "Dedicated expert",
+      "Unlimited custom automations",
+      "White-glove onboarding",
+      "Full operational support",
+      "Priority implementation",
+      "7-day free trial included",
     ],
     popular: false,
   },
@@ -64,10 +65,9 @@ const pricingPlans = [
 
 export default function PricingPage() {
   const router = useRouter()
-  const [selectedPlan, setSelectedPlan] = useState("professional")
+  const [selectedPlan, setSelectedPlan] = useState("managed")
 
   const handleContinue = () => {
-    // Store selected plan
     localStorage.setItem("selectedPlan", selectedPlan)
     router.push("/payment")
   }
@@ -75,10 +75,21 @@ export default function PricingPage() {
   return (
     <PageLayout>
       <PageHeader
-        title="Choose Your Plan"
-        description="Select a plan that fits your business needs"
+        title="The Most Affordable Workforce Upgrade on Earth"
+        description="Every plan includes a free 7-day trial and performance guarantee."
       />
       <div className="mx-auto max-w-5xl py-16">
+        <div className="mb-10 rounded-2xl border border-border/60 bg-muted/40 p-6 text-sm text-muted-foreground">
+          <p className="mb-2">
+            Hiring a marketer? $4,000–$7,000 per month. Customer support? $2,000–$3,500 per month. Executive assistant?
+            $2,500–$5,000 per month.
+          </p>
+          <p>
+            StaffPilot starts at <span className="font-semibold text-foreground">$59/month</span> — with a free audit
+            that shows your exact cost savings.
+          </p>
+        </div>
+
         <RadioGroup value={selectedPlan} onValueChange={setSelectedPlan} className="grid gap-6 md:grid-cols-3">
           {pricingPlans.map((plan) => (
             <Card
@@ -86,8 +97,8 @@ export default function PricingPage() {
               className={`relative transition-all hover:shadow-lg ${
                 selectedPlan === plan.id
                   ? "border-primary bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5"
-                  : ""
-              } ${plan.popular ? "border-primary/50" : ""}`}
+                  : "border-border"
+              } ${plan.popular ? "border-primary/60" : ""}`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -96,24 +107,14 @@ export default function PricingPage() {
                   </span>
                 </div>
               )}
-              <CardHeader
-                className="cursor-pointer"
-                onClick={() => setSelectedPlan(plan.id)}
-              >
+              <CardHeader className="cursor-pointer" onClick={() => setSelectedPlan(plan.id)}>
                 <div className="mb-4 flex items-start gap-3">
-                  <RadioGroupItem
-                    value={plan.id}
-                    id={plan.id}
-                    className="mt-1"
-                  />
-                  <Label
-                    htmlFor={plan.id}
-                    className="flex flex-1 cursor-pointer flex-col"
-                  >
+                  <RadioGroupItem value={plan.id} id={plan.id} className="mt-1" />
+                  <Label htmlFor={plan.id} className="flex flex-1 cursor-pointer flex-col">
                     <CardTitle className="text-xl">{plan.name}</CardTitle>
                     <div className="mt-2 flex items-baseline gap-2">
                       <span className="text-3xl font-bold">{plan.price}</span>
-                      <span className="text-sm text-muted-foreground">/{plan.period}</span>
+                      <span className="text-sm text-muted-foreground">/ {plan.period}</span>
                     </div>
                   </Label>
                 </div>
@@ -133,11 +134,15 @@ export default function PricingPage() {
           ))}
         </RadioGroup>
 
-        <div className="mt-8 flex justify-center">
-          <Button size="lg" onClick={handleContinue} className="min-w-[200px]">
-            Continue to Payment
+        <div className="mt-8 flex flex-col items-center gap-4 text-center">
+          <Button size="lg" onClick={handleContinue} className="min-w-[220px] ai-gradient">
+            Start Free 7-Day Trial
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
+          <p className="max-w-xl text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">Performance Guarantee:</span> If you don’t see measurable
+            improvements within 30 days, we optimise your AI setup for free until you do.
+          </p>
         </div>
       </div>
     </PageLayout>

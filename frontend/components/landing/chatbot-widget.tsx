@@ -28,10 +28,11 @@ export function ChatbotWidget() {
   // Add welcome message if no messages exist
   const displayMessages = messages.length === 0 ? [
     {
-      id: 'welcome',
-      role: 'assistant' as const,
-      content: "👋 Hi! I'm CODIAN's AI assistant. I can help you learn about our AI-as-a-Service platform, our AI personas, pricing, and how to get started. What would you like to know?"
-    }
+      id: "welcome",
+      role: "assistant" as const,
+      content:
+        "👋 Hi! I'm StaffPilot's AI assistant. I can help you learn about our AI employees, pricing, and how to hire your first AI team member. What would you like to know?",
+    },
   ] : messages
 
   const sendMessage = async (text: string) => {
@@ -210,7 +211,7 @@ export function ChatbotWidget() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder="Ask me anything about CODIAN..."
+                  placeholder="Ask me anything about StaffPilot or AI employees..."
                   rows={1}
                   className="w-full px-4 py-3 pr-12 rounded-xl border border-ai-primary/20 dark:border-gray-600 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-ai-primary/50 resize-none text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   disabled={isLoading}
