@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { usePathname } from "next/navigation"
 import { X, Send, MessageCircle, Sparkles, Bot, User, Loader2 } from 'lucide-react'
 import Markdown from 'react-markdown'
 import { useChatbot } from "@/components/chatbot-context"
@@ -17,6 +18,14 @@ export function ChatbotWidget() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const pathname = usePathname()
+
+  // Close chat whenever the route changes (e.g. user clicks to another page)
+  useEffect(() => {
+    if (isOpen) {
+      closeChatbot()
+    }
+  }, [pathname, isOpen, closeChatbot])
 
   // Add welcome message if no messages exist
   const displayMessages = messages.length === 0 ? [
@@ -128,7 +137,7 @@ export function ChatbotWidget() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-4 w-[calc(100vw-2rem)] sm:left-auto sm:right-6 sm:w-[380px] h-[600px] z-50 flex flex-col bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-ai-primary/20 border border-ai-primary/20 overflow-hidden">
+        <div className="fixed bottom-6 right-4 w-[calc(100vw-2rem)] sm:left-auto sm:right-6 sm:w-[380px] max-h-[80vh] sm:max-h-[85vh] z-50 flex flex-col bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-ai-primary/20 border border-ai-primary/20 overflow-hidden">
           {/* Header */}
           <div className="relative flex items-center justify-between p-4 bg-gradient-to-r from-ai-primary via-ai-secondary to-ai-accent">
             <div className="flex items-center gap-3">
