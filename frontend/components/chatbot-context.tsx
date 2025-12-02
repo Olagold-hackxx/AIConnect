@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from "react"
+import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from "react"
 
 interface ChatbotContextType {
   isOpen: boolean
@@ -14,16 +14,26 @@ export function ChatbotProvider({ children }: Readonly<{ children: ReactNode }>)
   const [isOpen, setIsOpen] = useState(false)
   const [hasAutoOpened, setHasAutoOpened] = useState(false)
 
-  // Auto-open chatbot once after a delay (only once per page load/session)
+  // Gently auto-open the chatbot once per session after a short delay
   useEffect(() => {
-    if (!hasAutoOpened) {
-      const timer = setTimeout(() => {
-        setIsOpen(true)
-        setHasAutoOpened(true)
-      }, 2000) // 2 second delay
+    if (hasAutoOpened) return
 
-      return () => clearTimeout(timer)
+    // Only run in the browser
+    if (typeof window === "undefined") return
+
+    const alreadyOpened = window.sessionStorage.getItem("chatbot-auto-opened")
+    if (alreadyOpened) {
+      setHasAutoOpened(true)
+      return
     }
+
+    const timer = setTimeout(() => {
+      setIsOpen(true)
+      setHasAutoOpened(true)
+      window.sessionStorage.setItem("chatbot-auto-opened", "true")
+    }, 8000) // open once after ~8 seconds
+
+    return () => clearTimeout(timer)
   }, [hasAutoOpened])
 
   const value = useMemo(

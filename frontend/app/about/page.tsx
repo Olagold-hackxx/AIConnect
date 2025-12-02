@@ -136,30 +136,7 @@ export default function AboutPage() {
             </Card>
           </div>
 
-          {/* Proof & Success Stories */}
-          <div className="mb-16">
-            <h2 className="mb-6 text-center text-3xl font-bold">Proof &amp; Success Stories</h2>
-            <p className="mb-8 text-center text-sm text-muted-foreground">
-              (*Placeholder — add real results when ready*)
-            </p>
-            <div className="grid gap-6 md:grid-cols-3">
-              <Card>
-                <CardContent className="pt-6 text-sm text-muted-foreground">
-                  “StaffPilot saved us over 40 hours per month instantly.”
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6 text-sm text-muted-foreground">
-                  “Our lead gen doubled in 30 days.”
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="pt-6 text-sm text-muted-foreground">
-                  “Support became 24/7 overnight without hiring.”
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+          
 
           {/* CTA: Free Trial + Free Audit */}
           <div className="rounded-2xl border border-border/50 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 p-8 text-center sm:p-12">

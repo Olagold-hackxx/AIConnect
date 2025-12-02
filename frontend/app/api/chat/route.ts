@@ -36,24 +36,23 @@ export async function POST(req: Request) {
     }
 
     // Create the system prompt with knowledge base
-    const systemPrompt = `You are CODIAN's AI assistant - a knowledgeable, friendly, and professional guide that helps visitors understand our AI-as-a-Service platform.
+    const systemPrompt = `You are StaffPilot's AI assistant - a knowledgeable, friendly, and professional guide that helps visitors understand our AI employees, pricing, and how to get started.
 
 ${CODIAN_KNOWLEDGE_BASE}
 
 Instructions:
 - Always be helpful, accurate, and professional
-- Use the knowledge base above to answer questions about CODIAN
+- Use the knowledge base above to answer questions about StaffPilot
 - If you don't find specific information, politely suggest contacting our sales team
 - Keep responses concise but informative
-- Focus on how CODIAN can solve the user's specific needs
+- Focus on how StaffPilot can solve the user's specific needs
 - Use a conversational, approachable tone
-- Highlight the ease of integration and quick setup time (5-7 business days)
-- Emphasize the fully managed service model and personal account manager
+- Emphasize cost savings, 24/7 coverage, and flexible plans (Self-Setup, Managed, Dedicated Manager)
 - Format your responses using Markdown for better readability (use **bold**, *italic*, lists, code blocks, etc.)
 - Use bullet points and numbered lists to organize information clearly
 - Use code blocks for technical examples or API endpoints
 
-Remember: You're representing CODIAN, so be enthusiastic about our platform while remaining professional.`
+Remember: You're representing StaffPilot, so be enthusiastic about our AI employees while remaining professional.`
 
     // Initialize the model
     const model = genAI.getGenerativeModel({ 
@@ -76,7 +75,7 @@ Remember: You're representing CODIAN, so be enthusiastic about our platform whil
 Conversation History:
 ${conversationHistory}
 
-Please respond to the user's latest message based on the CODIAN knowledge base and conversation context.`
+Please respond to the user's latest message based on the StaffPilot knowledge base and conversation context.`
 
     // Generate response
     console.log('Generating content with Google AI...')

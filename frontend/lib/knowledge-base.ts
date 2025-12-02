@@ -1,86 +1,95 @@
 export const CODIAN_KNOWLEDGE_BASE = `
-# CODIAN Knowledge Base
+# StaffPilot Knowledge Base
 
 ## Overview
-CODIAN is a human-enabled AI automation service that provides fully managed AI assistants for businesses. Unlike self-serve AI tools, CODIAN combines intelligent AI personas with experienced human support to deliver AI agents powered by human expertise. We handle all the technical setup, integration, and ongoing management for you. Professional and Enterprise clients are assigned dedicated human managers who oversee their AI assistants, ensuring everything runs smoothly without any technical expertise required from the client.
+StaffPilot is the AI Employee Company — a service that gives businesses always-on AI employees with human personas. Unlike self-serve AI tools, StaffPilot combines intelligent AI employees with proven workflows and optional human management to deliver real business outcomes. We handle configuration and optimisation so your AI employee can work 24/7 across marketing, support, admin, and more.
 
-Our mission is to make enterprise-grade AI accessible to businesses of all sizes through a done-for-you service model that combines AI automation with human expertise.
+Our mission is simple: give every business a high-performing team member without the high-performing price tag.
 
 ## Core Value Proposition
-- **Human-Enabled AI Automation**: AI agents powered by human support and expertise
-- **Fully Managed Service**: We handle everything from setup to daily management
-- **Dedicated Human Managers**: Professional and Enterprise plans include dedicated human managers who oversee your AI assistants (Starter plan is self-service after setup)
-- **Zero Technical Expertise Required**: If you can make a phone call, you can use CODIAN
-- **Specialized AI Assistants**: Three pre-trained AI personas (Rita - Digital Marketer, Jane - Executive Assistant, David - Customer Support) for specific business roles
-- **No Setup Hassle**: We do all the heavy lifting while you focus on growth
+- **AI Employees, Not Just Tools**: Digital workers with human-like personas that handle real business tasks
+- **Works 24/7, Never Gets Tired**: No breaks, no sick days, no downtime
+- **Costs 80–90% Less Than Hiring Humans**: Replace or augment expensive roles at a fraction of the cost
+- **Flexible Service Levels**: Choose self-setup, managed, or fully dedicated human manager support
+- **Built for Western Businesses, Powered Offshore**: Premium quality, global efficiency, competitive pricing
+- **Free 7-Day Trial + Free Efficiency Audit**: Try before you commit and see your exact savings
 
-## What Makes CODIAN Different
-CODIAN isn't software you install or configure. It's a premium human-enabled AI automation service where AI personas work alongside experienced human managers. Our human-enabled approach ensures your AI assistants execute tasks effectively with expert human oversight from strategy to optimization. You don't integrate anything. You don't configure anything. CODIAN does all the technical work while human managers ensure quality and business alignment.
+## What Makes StaffPilot Different
+StaffPilot isn’t just another AI tool or chatbot. It’s a new kind of workforce:
 
-## AI Assistants & Capabilities
+- AI employees come with human-like personas and business-ready workflows
+- Each role is trained for specific tasks (marketing, support, admin, outreach, research, etc.)
+- Optional human managers can oversee, optimise, and customise your AI employees
+- You can start with a free trial and audit, then scale up as you see results
 
-### 1. Digital Marketer AI Assistant (Rita)
-**Unlimited Skills Under Marketing Role:**
-- Social media management and scheduling
-- Campaign strategy development
-- Ad creation and copywriting
-- Performance reporting and analytics
-- Content calendar planning
-- Email marketing campaigns
-- SEO optimization recommendations
-- Competitor analysis
-- Brand voice consistency
-- A/B testing suggestions
+## AI Employees & Capabilities
 
-**Perfect For:** Marketing agencies, e-commerce businesses, startups needing marketing automation
+### 1. AI Marketer “Mia”
+**Handles:**
+- Social media posting and content calendar management
+- Content creation (blogs, captions, emails, scripts)
+- Ad ideas & scripts for paid campaigns
+- SEO content outlines and optimisation suggestions
+- Email marketing campaigns and nurture flows
 
-### 2. Executive Assistant AI Assistant (Jane)
-**Unlimited Skills Under Administrative Role:**
+**Perfect For:** Marketing agencies, e-commerce brands, coaches, and founders who need consistent marketing without hiring a full team.
+
+### 2. AI Support Agent “Eli”
+**Handles:**
+- 24/7 customer responses
+- Human-like conversation in chat and email
+- Ticket handling and routing
+- Order updates and basic account changes
+- Customer nurturing and FAQ management
+- Complaint intake and escalation
+
+**Perfect For:** E-commerce, SaaS, service businesses, or any company that needs responsive, round-the-clock support.
+
+### 3. AI Executive Assistant “Ava”
+**Handles:**
 - Calendar management and scheduling
-- Email triage and response drafting
-- Meeting preparation and note-taking
-- Task management and reminders
-- Travel planning and itinerary creation
-- Document preparation and organization
-- Research and information gathering
-- Expense tracking and reporting
-- Contact management
-- Follow-up coordination
+- Email drafting and inbox triage
+- Research and information summaries
+- Reminders and task management
+- Document creation and organisation
 
-**Perfect For:** Executives, busy professionals, small business owners, consultants
+**Perfect For:** Founders, executives, and busy operators who need an organised, always-on assistant.
 
-### 3. Customer Support AI Assistant (David)
-**Unlimited Skills Under Support Role:**
-- 24/7 client inquiry handling
-- Live chat management
-- Ticket triage and categorization
-- Common issue resolution
-- Product information and troubleshooting
-- Escalation to human agents when needed
-- Support documentation creation
-- Customer satisfaction tracking
-- Multi-language support
-- FAQ management
+### 4. AI Business Development Rep “Jax”
+**Handles:**
+- Lead generation and list research
+- Personalised outreach (email, LinkedIn-style messaging, etc.)
+- Follow-ups and pipeline nurturing
+- Sales call preparation and recap notes
 
-**Perfect For:** E-commerce stores, SaaS companies, service businesses, online retailers
+**Perfect For:** B2B founders, agencies, and sales teams that want consistent outbound without hiring multiple SDRs.
 
-## How CODIAN Works
+### 5. AI Researcher “Nova”
+**Handles:**
+- Market research and competitive analysis
+- Data summarisation and insight extraction
+- Report drafting and breakdowns
+- Opportunity and trend analysis
 
-### Step 1: You Choose Your Plan
-Select the plan that fits your business needs:
-- Starter: $500 one-time setup - All 3 AI Assistants, basic setup, no ongoing support
-- Professional: $600/month - All 3 AI Assistants with human manager support
-- Enterprise: $1000/month - All 3 AI Assistants with fully dedicated human manager
+**Perfect For:** Strategy, product, and leadership teams that need fast, accurate research on demand.
 
-### Step 2: We Set Everything Up
+## How StaffPilot Works
+
+### Step 1: Choose Your Plan
+Select the plan that fits your business needs and level of support:
+- **Tier 1 — Self-Setup**: $59–$149/month — For DIY founders and fast executors
+- **Tier 2 — Managed**: $299–$599/month — We set up, optimise, and improve everything weekly
+- **Tier 3 — Dedicated Manager**: $1,500–$4,000/month — Your own human expert + AI employee and full operational support
+
+### Step 2: We Set Everything Up (or You Do)
 Our technical team handles all integration with your existing systems:
 - Connect to your email, calendar, CRM, or support platform
 - Configure AI assistants to match your business needs
 - Train AI on your company's specific processes and data
 - Test everything to ensure flawless operation
 
-### Step 3: Your Human Manager Takes Over (Professional & Enterprise Plans)
-Professional and Enterprise clients are assigned a dedicated human manager who:
+### Step 3: (Optional) Your Human Manager Takes Over
+Managed and Dedicated Manager clients are assigned a human expert who:
 - Monitors your AI assistants daily with expert oversight
 - Handles any issues or adjustments with human judgment
 - Provides regular performance reports and strategic insights
@@ -88,10 +97,10 @@ Professional and Enterprise clients are assigned a dedicated human manager who:
 - Serves as your single point of contact for all AI-related matters
 - Ensures your AI assistants execute tasks effectively with human-enabled quality assurance
 
-**Note:** Starter plan includes setup only - no ongoing human manager support.
+**Note:** Self-Setup is designed for those comfortable configuring and running their AI employee with templates and guidance.
 
 ### Step 4: You Focus on Growth
-While CODIAN manages your AI assistants, you focus on what matters:
+While StaffPilot runs your AI employees, you focus on what matters:
 - Growing your business
 - Serving your customers
 - Developing new products
@@ -99,43 +108,38 @@ While CODIAN manages your AI assistants, you focus on what matters:
 
 ## Pricing Plans
 
-### Starter Plan - $500 One-Time Setup
-**Perfect for businesses starting with AI automation**
-- All 3 AI Assistants (Rita, Jane, David)
-- Uptime guarantee
-- Basic setup and configuration
-- Email support during setup
-- **No ongoing support included** - Self-service after setup
+### Tier 1 — Self-Setup ($59–$149/month)
+**For DIY founders and fast executors**
+- Full AI employee
+- Templates & workflows
+- Pre-built personas
+- Unlimited tasks
+- Email support
+- 7-day free trial included
 
-**Best For:** Small businesses testing AI automation, startups wanting to try CODIAN without ongoing commitment
+**Best For:** Small businesses and lean teams who want to move quickly and are comfortable making basic adjustments themselves.
 
-**Note:** This plan does not include ongoing human manager support. For businesses needing human-enabled AI with dedicated manager oversight, consider Professional or Enterprise plans.
-
-### Professional Plan - $600/Month
-**Ideal for businesses needing AI automation with human manager support**
-- All 3 AI Assistants (Rita, Jane, David)
-- Uptime guarantee
-- **Human manager with great support** - Your dedicated human manager ensures your AI assistants execute tasks effectively
+### Tier 2 — Managed ($299–$599/month)
+**We set up, optimise, and improve everything weekly**
+- Everything in Self-Setup
+- Human account manager
+- Weekly improvements and optimisation
+- Monthly analytics reports
 - Priority support
-- Custom integration setup
-- Advanced analytics
+- Personalised optimisation based on your goals
 
-**Best For:** Growing agencies, established SMBs, multi-channel businesses wanting human-enabled AI automation
+**Best For:** Growing businesses that want a “done-with-you” AI employee managed by experts.
 
-**Most Popular Choice**
+### Tier 3 — Dedicated Manager ($1,500–$4,000/month)
+**Your own human expert + AI employee**
+- Everything in Managed
+- Dedicated expert managing your AI employee full-time
+- Unlimited custom automations
+- White-glove onboarding
+- Full operational support
+- Priority implementation and fast iteration
 
-### Enterprise Plan - $1000/Month
-**Complete AI automation with fully dedicated human manager**
-- All 3 AI Assistants (Rita, Jane, David)
-- Uptime guarantee
-- **Fully dedicated human manager** - Expert human oversight ensuring quality and business alignment
-- Option to hire your manager internally later
-- 24/7 premium support
-- Full custom integration
-- Advanced analytics & reporting
-- Custom AI training on your data
-
-**Best For:** Large agencies, established enterprises, high-volume businesses requiring maximum human-enabled AI support
+**Best For:** Teams that want a true AI operations partner — combining a powerful AI employee with a dedicated human operator.
 
 ## What's Included
 
@@ -149,29 +153,22 @@ While CODIAN manages your AI assistants, you focus on what matters:
 
 ### Ongoing Management & Human Support
 
-**Starter Plan:**
-- Setup and configuration only
-- No ongoing human manager support
-- Self-service after initial setup
+**Self-Setup:**
+- Setup and configuration via templates and guidance
+- No ongoing human manager required
+- Ideal for hands-on operators
 
-**Professional Plan (Human-Enabled):**
-- Daily monitoring with human manager oversight
-- Human manager ensures AI assistants execute tasks effectively
-- Performance optimization with strategic human insights
-- Issue resolution with human judgment
-- Regular updates and improvements
-- Direct access to your human manager
-- Regular performance reports
-- Strategy consultation
-- Best practice recommendations
+**Managed:**
+- Weekly optimisation from a human account manager
+- Performance reviews and analytics
+- Strategy suggestions and workflow refinement
+- Priority support
 
-**Enterprise Plan (Fully Human-Enabled):**
-- All Professional features plus:
-- Fully dedicated human manager with 24/7 oversight
-- Daily performance monitoring with expert analysis
-- Advanced strategy consultation
-- Custom AI training on your proprietary data
-- Option to recruit your human manager internally
+**Dedicated Manager:**
+- Full-time, hands-on human expert running your AI employee
+- Daily monitoring, iteration, and optimisation
+- Custom automations and deep workflow design
+- Strategy collaboration and implementation support
 
 ## Industries We Serve
 
@@ -195,66 +192,53 @@ Schedule appointments, send reminders, answer common questions, and manage patie
 
 ## Frequently Asked Questions
 
-**Q: Do I need any technical knowledge to use CODIAN?**
-A: No! That's the whole point. CODIAN is a human-enabled AI automation service. If you can make a phone call or send an email, you can use CODIAN. We handle all the technical aspects. Professional and Enterprise plans include human managers who ensure everything works smoothly.
+**Q: What is an AI employee?**
+A: An AI employee is a digital worker that performs business tasks such as marketing, support, admin, lead generation, and more — all powered by AI and configured for your workflows.
 
-**Q: What is human-enabled AI automation?**
-A: CODIAN's human-enabled AI combines intelligent AI personas with experienced human support. Our AI assistants execute tasks efficiently, while human managers provide oversight, strategic thinking, and quality assurance. This ensures your AI agents deliver real business results, not just automated responses. Professional plans include human manager support, while Enterprise plans get fully dedicated human managers.
+**Q: How does StaffPilot work?**
+A: You choose a role (or roles), we configure your AI employee, you plug it into your business, and it works 24/7. Depending on your plan, you can manage it yourself or have a human expert manage and optimise it for you.
 
-**Q: How long does setup take?**
-A: Typically 5-7 business days from signing up to having your AI assistants fully operational. We handle everything during this time.
+**Q: Can an AI employee replace a human?**
+A: In many roles, yes. AI employees can perform faster, more consistently, and at a dramatically lower cost — especially for repeatable, process-driven work.
 
-**Q: Can I switch between AI assistants?**
-A: Yes! All plans include all 3 AI assistants (Rita - Digital Marketer, Jane - Executive Assistant, David - Customer Support). Professional and Enterprise clients can adjust their AI assistant usage with 30 days notice. Your human manager will handle the transition.
+**Q: Is it hard to set up?**
+A: No. Self-Setup includes templates and best practices, and Managed/Dedicated plans include human experts who handle setup, optimisation, and ongoing improvements for you.
 
-**Q: What if I want to bring the management in-house later?**
-A: Professional and Enterprise plans include the option to recruit your human manager internally. We'll help with the transition and provide training. This is especially valuable for Enterprise clients who work closely with their dedicated human manager.
 
 **Q: Is my data secure?**
-A: Absolutely. We use enterprise-grade encryption, comply with GDPR, CCPA, and SOC 2 Type II standards. We can also sign custom NDAs and data processing agreements.
+A: Absolutely. We use industry-standard encryption, follow modern security best practices, and can work with your compliance needs (GDPR/CCPA-style requirements, NDAs, etc.).
 
 **Q: Can the AI assistants be trained on my company's specific data?**
 A: Yes! All plans include training on your business processes. Enterprise plans include advanced custom training on proprietary data.
 
-**Q: What happens if something goes wrong?**
-A: For Professional and Enterprise plans, your human manager monitors everything daily and will proactively address any issues with human judgment and expertise. You have direct access to your human manager. Starter plan clients can use email support during setup but do not have ongoing human manager support.
-
 **Q: Can I cancel anytime?**
-A: Yes, all plans are month-to-month with no long-term contracts. The Starter plan setup fee is non-refundable, but monthly fees can be canceled with 30 days notice.
+A: Yes, plans are generally month-to-month with no long-term contracts. You can downgrade or cancel with reasonable notice depending on your agreement.
 
 **Q: How is this different from using ChatGPT or other AI tools directly?**
-A: CODIAN provides human-enabled AI automation with specialized AI assistants optimized for specific business tasks, fully integrated with your systems, and managed by human experts. Professional and Enterprise plans include dedicated human managers who ensure your AI assistants execute tasks effectively. You don't need to write prompts, manage integrations, or troubleshoot issues - our human managers handle everything.
-
-**Q: Do you offer refunds?**
-A: We offer a 30-day satisfaction guarantee on all monthly plans. If you're not satisfied, we'll refund your first month (setup fees excluded).
+A: StaffPilot gives you pre-configured AI employees, role-specific workflows, and (on higher tiers) human management — so you’re not writing prompts or building systems yourself. It’s closer to hiring a trained team member than buying a raw AI tool.
 
 ## Success Metrics
 
-### Average Client Results
+### Example Outcomes
 - **80% reduction** in routine inquiry response time
 - **$3,000-$8,000** monthly savings on administrative costs
 - **24/7 availability** without hiring night shift staff
 - **45% increase** in lead response speed
 - **60% reduction** in scheduling conflicts
 
-### Client Testimonials
+### Example Testimonials (Placeholder)
 
-"CODIAN transformed our customer support. We went from struggling to answer emails within 24 hours to providing instant responses 24/7. Our customer satisfaction scores increased by 35%." 
-— Sarah Chen, Owner, TechGear Online
-
-"As a solo consultant, I was drowning in administrative work. CODIAN's Executive Assistant handles my calendar, emails, and research. I've reclaimed 15 hours per week to focus on billable client work."
-— Michael Rodriguez, Business Consultant
-
-"We were hesitant about AI, but CODIAN made it effortless. They handled everything, and now our marketing runs like clockwork. Best investment we've made this year."
-— Jennifer Park, Marketing Director, GrowthLab Agency
+"StaffPilot saved us over 40 hours per month instantly."  
+"Our lead gen doubled in 30 days."  
+"Support became 24/7 overnight without hiring."
 
 ## Getting Started
 
-### Step 1: Schedule a Consultation
+### Step 1: Book a Free Audit or Strategy Call
 Talk to one of our AI specialists to discuss your business needs and determine the right plan.
 
 ### Step 2: Choose Your Plan
-Select Starter, Professional, or Enterprise based on your requirements and budget.
+Select Self-Setup, Managed, or Dedicated Manager based on your requirements and budget.
 
 ### Step 3: Onboarding
 We'll schedule an onboarding call to understand your business, systems, and goals.
@@ -266,33 +250,27 @@ Our team integrates and configures your AI assistants while you continue running
 Your account manager will guide you through the launch and ensure everything works perfectly.
 
 ### Step 6: Ongoing Success
-Enjoy AI automation while your account manager handles all the technical details.
+Enjoy AI employees working 24/7 while your team focuses on high-leverage work.
 
 ## Contact Information
 
-- **Sales Inquiries**: sales@codian.ai
-- **Support**: support@codian.ai  
-- **Phone**: 1-800-CODIAN-AI
-- **Live Chat**: Available on our website 9am-6pm EST, Monday-Friday
+- **Sales Inquiries**: sales@staffpilot.ai
+- **Support**: support@staffpilot.ai  
+- **Live Chat**: Available via the widget on our website
 
 ## Company Information
 
-CODIAN is a managed AI services company founded in 2024 by former AI engineers and business consultants. Our mission is to democratize AI access by removing the technical barriers that prevent businesses from benefiting from artificial intelligence.
-
-**Headquarters:** San Francisco, CA  
-**Service Coverage:** United States, Canada, United Kingdom, Australia  
-**Team:** 25+ AI specialists and account managers  
-**Clients:** 200+ businesses across 15 industries
+StaffPilot is focused on building the future of work — where AI employees handle the busywork so humans can focus on what matters most.
 
 ---
 
 ## Chatbot Personality & Response Guidelines
 
-When answering questions as the CODIAN chatbot:
+When answering questions as the StaffPilot chatbot:
 
 1. **Be conversational and warm** - You're representing a service company, not a software product
-2. **Emphasize the "done-for-you" aspect** - Constantly remind users they don't need technical skills
-3. **Highlight the account manager benefit** - This is a key differentiator
+2. **Emphasize ease and speed** - Constantly remind users they don’t need heavy lifting to get value
+3. **Highlight cost savings and 24/7 coverage** - This is a key differentiator
 4. **Use real-world examples** - Help users visualize how CODIAN would work in their business
 5. **Be honest about limitations** - If you don't know something, offer to connect them with a specialist
 6. **Focus on business outcomes** - Talk about time saved, costs reduced, growth enabled
@@ -302,5 +280,5 @@ When answering questions as the CODIAN chatbot:
 10. **Be professional but friendly** - Strike a balance between expert and approachable
 
 **Example Tone:**
-"Great question! With CODIAN, you don't need to worry about any technical setup. Once you choose your plan, we assign you a dedicated account manager who handles everything - from connecting the AI to your systems to monitoring it daily. You literally just tell us what you need, and we make it happen. Want to chat with one of our specialists to see how this would work for your specific business?"
+"Great question! With StaffPilot, you don’t need to worry about building prompts or complex systems. You choose the AI employee you need, we configure it for your workflows, and — on managed plans — our team keeps it optimised. You focus on growth while your AI employee handles the busywork. Want to see what this would look like for your business? I can point you to a free demo or audit."
 `
