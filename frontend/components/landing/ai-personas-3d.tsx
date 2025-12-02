@@ -4,28 +4,28 @@ import Link from "next/link"
 
 const personas = [
   {
-    role: "Digital Marketer",
-    name: "Rita",
-    description: "Social media management, campaign strategy, ad creation, and performance reporting",
-    image:  "/ai-assistant-digital-marketer.jpg",
+    role: "AI Marketer “Mia”",
+    name: "Mia",
+    description: "Friendly, creative, social-media smart. Perfect for ads, content, and branding tasks.",
+    image: "/ai-assistant-digital-marketer.jpg",
     bgGradient: "from-orange-400 via-yellow-400 to-orange-500",
     textColor: "text-orange-900",
   },
   {
-    role: "Executive Assistant",
-    name: "Jane",
-    description: "Scheduling, task management, communication, document prep, and research",
-    image: "/ai-assistant-executive.jpg",
-    bgGradient: "from-orange-400 via-pink-400 to-orange-500",
-    textColor: "text-orange-900",
-  },
-  {
-    role: "Customer Support",
-    name: "David",
-    description: "Client inquiries, live chat, ticket management, and support automation",
+    role: "AI Support Agent “Eli”",
+    name: "Eli",
+    description: "Calm, patient, human-like responses. Handles support, tickets, and customer care 24/7.",
     image: "/ai-assistant-customer-support.jpg",
     bgGradient: "from-pink-500 via-fuchsia-500 to-pink-600",
     textColor: "text-pink-900",
+  },
+  {
+    role: "AI Executive Assistant “Ava”",
+    name: "Ava",
+    description: "Organised, detail-oriented. Manages your calendar, inbox, documents, and admin.",
+    image: "/ai-assistant-executive.jpg",
+    bgGradient: "from-orange-400 via-pink-400 to-orange-500",
+    textColor: "text-orange-900",
   },
 ]
 
@@ -41,7 +41,7 @@ export function AIPersonas3D() {
             </span>
           </h2>
           <p className="mx-auto max-w-2xl text-pretty text-lg text-muted-foreground">
-            Three specialized AI assistants, fully managed by CODIAN and tailored to your business needs
+            Get to know the AI employees that work like real people — with personality, professionalism, and precision.
           </p>
         </div>
 

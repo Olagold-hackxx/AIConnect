@@ -1,9 +1,8 @@
 """
 Scheduled Posts Worker - Celery tasks for periodic content posting
 """
-import asyncio
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from uuid import UUID
 from celery.schedules import crontab
 
@@ -12,151 +11,233 @@ from app.utils.logger import logger
 from app.workers.content_creation import execute_content_creation
 
 
-@celery_app.task(name="scheduled_posts.process_scheduled", bind=True)
-def process_scheduled_posts(self) -> Dict[str, Any]:
+@celery_app.task(name="scheduled_posts.check_scheduled", bind=True, max_retries=3)
+def check_scheduled_posts(self) -> Dict[str, Any]:
     """
-    Periodic task that checks for scheduled posts ready to execute
-    This is called by Celery Beat on a regular interval
+    Periodic task to check for scheduled posts that need to be published.
+    This task only finds due posts and triggers separate execution tasks.
+    Called by Celery Beat on a regular interval (every 2 minutes).
     """
     try:
-        # Create a new event loop for this task
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+        from app.db.session import create_worker_session_factory
+        from sqlalchemy import select, and_
+        from app.models.content import ScheduledPost
         
-        async def _process():
+        SessionFactory = create_worker_session_factory()
+        db = SessionFactory()
+        try:
+            now = datetime.now(timezone.utc)
+            
+            # Find all active scheduled posts that are due for publishing
+            # Using sync session - no await needed
+            result = db.execute(
+                select(ScheduledPost).where(
+                    and_(
+                        ScheduledPost.is_active == True,
+                        ScheduledPost.status == "active",
+                        ScheduledPost.next_run_at <= now,
+                        (ScheduledPost.end_date.is_(None)) | (ScheduledPost.end_date >= now)
+                    )
+                )
+            )
+            scheduled_posts = result.scalars().all()
+            
+            if len(scheduled_posts) == 0:
+                logger.debug("No scheduled posts ready to execute")
+                return {
+                    "success": True,
+                    "triggered_count": 0,
+                    "total_found": 0
+                }
+            
+            logger.info(f"Found {len(scheduled_posts)} scheduled posts ready to execute")
+            
+            triggered_count = 0
+            for scheduled_post in scheduled_posts:
+                try:
+                    # Validate that the scheduled post has required data
+                    if not scheduled_post.platforms or len(scheduled_post.platforms) == 0:
+                        logger.warning(f"No platforms configured for scheduled post {scheduled_post.id}")
+                        scheduled_post.status = "failed"
+                        scheduled_post.is_active = False
+                        db.commit()  # Sync commit - no await
+                        continue
+                    
+                    # Trigger the execution task for this scheduled post
+                    execute_scheduled_post.delay(str(scheduled_post.id))
+                    triggered_count += 1
+                    logger.info(f"Triggered execution for scheduled post {scheduled_post.id} ({scheduled_post.name})")
+                    
+                except Exception as e:
+                    logger.error(f"Error triggering scheduled post {scheduled_post.id}: {str(e)}", exc_info=True)
+            
+            logger.info(f"Processed {triggered_count} scheduled posts")
+            return {
+                "success": True,
+                "triggered_count": triggered_count,
+                "total_found": len(scheduled_posts)
+            }
+            
+        finally:
+            db.close()  # Sync close - no await
+    
+    except Exception as e:
+        logger.error(f"Error checking scheduled posts: {str(e)}", exc_info=True)
+        raise self.retry(exc=e, countdown=2**self.request.retries)
+
+
+@celery_app.task(name="scheduled_posts.execute_scheduled", bind=True, max_retries=3)
+def execute_scheduled_post(self, scheduled_post_id: str) -> Dict[str, Any]:
+    """
+    Execute a single scheduled post.
+    This task handles the actual execution, including:
+    - Creating execution record
+    - Triggering content creation
+    - Updating scheduled post status and next run time
+    """
+    try:
+        from app.db.session import create_worker_session_factory
+        from sqlalchemy import select
+        from app.models.content import ScheduledPost
+        from app.models.agent_execution import AgentExecution
+        
+        # Create a new session factory for this worker task (sync)
+        SessionFactory = create_worker_session_factory()
+        db = SessionFactory()
+        try:
+            now = datetime.now(timezone.utc)
+            
+            # Get the scheduled post (sync)
+            result = db.execute(
+                select(ScheduledPost).where(ScheduledPost.id == UUID(scheduled_post_id))
+            )
+            scheduled_post = result.scalar_one_or_none()
+            
+            if not scheduled_post:
+                logger.error(f"Scheduled post {scheduled_post_id} not found")
+                return {"success": False, "error": "Scheduled post not found"}
+            
+            if not scheduled_post.is_active or scheduled_post.status != "active":
+                logger.warning(f"Scheduled post {scheduled_post_id} is not active")
+                return {"success": False, "error": "Scheduled post is not active"}
+            
+            # Validate platforms
+            if not scheduled_post.platforms or len(scheduled_post.platforms) == 0:
+                logger.warning(f"No platforms configured for scheduled post {scheduled_post_id}")
+                scheduled_post.status = "failed"
+                scheduled_post.is_active = False
+                db.commit()  # Sync commit
+                return {"success": False, "error": "No platforms configured"}
+            
+            # Create execution record (sync)
+            execution = AgentExecution(
+                tenant_id=scheduled_post.tenant_id,
+                assistant_id=scheduled_post.assistant_id,
+                capability_id=scheduled_post.capability_id,
+                request_type="create_content",
+                request_data={
+                    "request": scheduled_post.request,
+                    "platforms": scheduled_post.platforms or [],
+                    "include_images": scheduled_post.include_images,
+                    "include_video": scheduled_post.include_video,
+                },
+                status="queued",
+                initiated_by=scheduled_post.created_by
+            )
+            db.add(execution)
+            db.commit()
+            db.refresh(execution)
+            
+            logger.info(f"Created agent execution {execution.id} for scheduled post {scheduled_post_id}")
+            
+            # Prepare request data
+            request_data = {
+                "request": scheduled_post.request,
+                "platforms": scheduled_post.platforms or [],
+                "include_images": scheduled_post.include_images,
+                "include_video": scheduled_post.include_video,
+            }
+            
+            # Queue the content creation task
+            execute_content_creation.delay(
+                execution_id=str(execution.id),
+                tenant_id=str(scheduled_post.tenant_id),
+                assistant_id=str(scheduled_post.assistant_id),
+                request_data=request_data
+            )
+            
+            # Update scheduled post tracking
+            scheduled_post.last_run_at = now
+            scheduled_post.total_runs += 1
+            scheduled_post.successful_runs += 1
+            
+            # Calculate next run time based on schedule type
+            next_run = _calculate_next_run(
+                scheduled_post.schedule_type,
+                scheduled_post.schedule_config,
+                now
+            )
+            
+            if next_run:
+                scheduled_post.next_run_at = next_run
+                
+                # Check if we've reached the end date
+                if scheduled_post.end_date and next_run > scheduled_post.end_date:
+                    scheduled_post.status = "completed"
+                    scheduled_post.is_active = False
+                    logger.info(f"Scheduled post {scheduled_post_id} has reached its end date")
+            else:
+                # One-time schedule completed
+                scheduled_post.status = "completed"
+                scheduled_post.is_active = False
+                logger.info(f"One-time scheduled post {scheduled_post_id} completed")
+            
+            db.commit()  # Sync commit
+            
+            return {
+                "success": True,
+                "scheduled_post_id": scheduled_post_id,
+                "execution_id": str(execution.id),
+                "next_run_at": next_run.isoformat() if next_run else None
+            }
+            
+        finally:
+            db.close()  # Sync close
+    
+    except Exception as e:
+        logger.error(f"Error executing scheduled post {scheduled_post_id}: {str(e)}", exc_info=True)
+        
+        # Update failure count (sync)
+        try:
             from app.db.session import create_worker_session_factory
-            from sqlalchemy import select, and_
+            from sqlalchemy import select
             from app.models.content import ScheduledPost
             
-            # Create a new session factory for this worker task
             SessionFactory = create_worker_session_factory()
             db = SessionFactory()
             try:
-                now = datetime.now(timezone.utc)
-                
-                # Find all active scheduled posts that are due
-                result = await db.execute(
-                    select(ScheduledPost).where(
-                        and_(
-                            ScheduledPost.is_active == True,
-                            ScheduledPost.status == "active",
-                            ScheduledPost.next_run_at <= now,
-                            (ScheduledPost.end_date.is_(None)) | (ScheduledPost.end_date >= now)
-                        )
-                    )
+                result = db.execute(
+                    select(ScheduledPost).where(ScheduledPost.id == UUID(scheduled_post_id))
                 )
-                scheduled_posts = result.scalars().all()
+                scheduled_post = result.scalar_one_or_none()
                 
-                logger.info(f"Found {len(scheduled_posts)} scheduled posts ready to execute")
-                
-                executed_count = 0
-                for scheduled_post in scheduled_posts:
-                    try:
-                        # Execute the content creation
-                        logger.info(f"Executing scheduled post {scheduled_post.id} ({scheduled_post.name})")
-                        
-                        # Create execution record first
-                        from app.services.agent_execution_service import AgentExecutionService
-                        execution_service = AgentExecutionService(db)
-                        
-                        execution = await execution_service.create_execution(
-                            tenant_id=scheduled_post.tenant_id,
-                            assistant_id=scheduled_post.assistant_id,
-                            capability_id=scheduled_post.capability_id,
-                            request_type="create_content",
-                            request_data={
-                                "request": scheduled_post.request,
-                                "platforms": scheduled_post.platforms or [],
-                                "include_images": scheduled_post.include_images,
-                                "include_video": scheduled_post.include_video,
-                            },
-                            initiated_by=scheduled_post.created_by
-                        )
-                        
-                        # Prepare request data
-                        request_data = {
-                            "request": scheduled_post.request,
-                            "platforms": scheduled_post.platforms or [],
-                            "include_images": scheduled_post.include_images,
-                            "include_video": scheduled_post.include_video,
-                        }
-                        
-                        # Queue the content creation task
-                        task = execute_content_creation.delay(
-                            execution_id=str(execution.id),
-                            tenant_id=str(scheduled_post.tenant_id),
-                            assistant_id=str(scheduled_post.assistant_id),
-                            request_data=request_data
-                        )
-                        
-                        scheduled_post.successful_runs += 1
-                        
-                        # Update scheduled post
-                        scheduled_post.last_run_at = now
-                        scheduled_post.total_runs += 1
-                        
-                        # Calculate next run time based on schedule type
-                        next_run = _calculate_next_run(
-                            scheduled_post.schedule_type,
-                            scheduled_post.schedule_config,
-                            now
-                        )
-                        
-                        if next_run:
-                            scheduled_post.next_run_at = next_run
-                            
-                            # Check if we've reached the end date
-                            if scheduled_post.end_date and next_run > scheduled_post.end_date:
-                                scheduled_post.status = "completed"
-                                scheduled_post.is_active = False
-                                logger.info(f"Scheduled post {scheduled_post.id} has reached its end date")
-                        else:
-                            # One-time schedule completed
-                            scheduled_post.status = "completed"
-                            scheduled_post.is_active = False
-                            logger.info(f"One-time scheduled post {scheduled_post.id} completed")
-                        
-                        await db.commit()
-                        executed_count += 1
-                        
-                    except Exception as e:
-                        logger.error(f"Error executing scheduled post {scheduled_post.id}: {str(e)}", exc_info=True)
-                        scheduled_post.failed_runs += 1
-                        scheduled_post.total_runs += 1
-                        
-                        # If too many failures, mark as failed
-                        if scheduled_post.failed_runs >= 5:
-                            scheduled_post.status = "failed"
-                            scheduled_post.is_active = False
-                            logger.error(f"Scheduled post {scheduled_post.id} marked as failed after 5 failures")
-                        
-                        await db.commit()
-                
-                return {
-                    "success": True,
-                    "executed_count": executed_count,
-                    "total_found": len(scheduled_posts)
-                }
-                
+                if scheduled_post:
+                    scheduled_post.failed_runs += 1
+                    scheduled_post.total_runs += 1
+                    
+                    # If too many failures, mark as failed
+                    if scheduled_post.failed_runs >= 5:
+                        scheduled_post.status = "failed"
+                        scheduled_post.is_active = False
+                        logger.error(f"Scheduled post {scheduled_post_id} marked as failed after 5 failures")
+                    
+                    db.commit()  # Sync commit
             finally:
-                await db.close()
+                db.close()  # Sync close
+        except Exception as update_error:
+            logger.error(f"Failed to update failure count: {str(update_error)}")
         
-        result = loop.run_until_complete(_process())
-        loop.close()
-        return result
-        
-    except Exception as e:
-        logger.error(f"Error processing scheduled posts: {str(e)}", exc_info=True)
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        raise self.retry(exc=e, countdown=2**self.request.retries)
 
 
 def _calculate_next_run(schedule_type: str, schedule_config: Dict[str, Any], current_time: datetime) -> Optional[datetime]:

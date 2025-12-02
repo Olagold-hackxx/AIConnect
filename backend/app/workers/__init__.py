@@ -1,9 +1,17 @@
 """
 Celery workers for background tasks
 """
+import os
+# Disable ChromaDB telemetry before any imports
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+os.environ["CHROMA_TELEMETRY_DISABLED"] = "1"
+os.environ["POSTHOG_DISABLED"] = "1"
+
 from celery import Celery
 from app.config import settings
 import ssl
+from celery.schedules import crontab
+
 
 # Dynamically build Redis broker configuration
 broker_url = settings.CELERY_BROKER_URL
@@ -55,7 +63,6 @@ celery_config = {
     # Task tracking
     "task_track_started": True,
     "task_time_limit": 1800,  # 30 minutes
-    "task_soft_time_limit": 1500,  # 25 minutes
     
     # Redis-specific settings
     "broker_connection_retry_on_startup": True,
@@ -81,14 +88,23 @@ if backend_use_ssl_flag:
 else:
     celery_config["result_backend_transport_options"] = result_backend_transport_options
 
+# Disable Celery telemetry to avoid errors
+# This prevents the "capture() takes 1 positional argument but 3 were given" error
+import os
+os.environ.setdefault("CELERY_SEND_TASK_EVENTS", "False")
+
 # Add remaining configuration
 celery_config.update({
+    # Disable telemetry
+    "worker_send_task_events": False,
+    "task_send_sent_event": False,
+    
     # Task result settings
     "result_expires": 3600,  # Results expire after 1 hour
     "result_persistent": True,  # Persist results in Redis
     
     # Worker settings
-    "worker_prefetch_multiplier": 4,  # Prefetch 4 tasks per worker
+    "worker_prefetch_multiplier": 1,  # Prefetch 1 task at a time to prevent blocking
     "worker_max_tasks_per_child": 1000,  # Restart worker after 1000 tasks
     
     # Task routing (optional - comment out to use default queue)
@@ -100,14 +116,22 @@ celery_config.update({
     # },
     
     # Task acknowledgment
-    "task_acks_late": True,  # Acknowledge tasks after completion
+    "task_acks_late": False,  # Acknowledge tasks before execution to prevent blocking on hangs
     "task_reject_on_worker_lost": True,  # Reject tasks if worker dies
+    
+    # Worker logging - reduce verbosity for scheduled tasks
+    "worker_log_format": "[%(asctime)s: %(levelname)s/%(processName)s] %(message)s",
+    "worker_task_log_format": "[%(asctime)s: %(levelname)s/%(processName)s][%(task_name)s(%(task_id)s)] %(message)s",
     
     # Celery Beat schedule for periodic tasks
     "beat_schedule": {
-        'process-scheduled-posts': {
-            'task': 'scheduled_posts.process_scheduled',
-            'schedule': 60.0,  # Run every 60 seconds to check for scheduled posts
+        'check-scheduled-posts': {
+            'task': 'scheduled_posts.check_scheduled',
+            'schedule': crontab(minute='*/2'),  # Run every 2 minutes to check for scheduled posts
+            'options': {
+                'expires': 300,  # Task expires after 5 minutes if not picked up
+                'time_limit': 1800,  # 30 minutes hard limit
+            }
         },
     },
 })

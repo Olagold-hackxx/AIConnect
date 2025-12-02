@@ -9,12 +9,13 @@ import { apiClient } from "@/lib/api"
 import { useToast } from "@/components/ui/use-toast"
 import { 
   Target, Plus, Loader2, CheckCircle2, Clock, Eye, 
-  Pause, DollarSign, Calendar, TrendingUp
+  Pause, DollarSign, Calendar, TrendingUp, MessageSquare, Send, AlertTriangle
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface Campaign {
   id: string
@@ -44,6 +45,13 @@ interface Execution {
   created_at: string
 }
 
+interface FeedbackMessage {
+  id: string
+  role: "user" | "assistant"
+  content: string
+  timestamp: Date
+}
+
 export default function CampaignsPage() {
   const { toast } = useToast()
   const router = useRouter()
@@ -52,6 +60,13 @@ export default function CampaignsPage() {
   const [loading, setLoading] = useState(true)
   const [executing, setExecuting] = useState(false)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [showApproveDialog, setShowApproveDialog] = useState(false)
+  const [campaignToApprove, setCampaignToApprove] = useState<Campaign | null>(null)
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false)
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null)
+  const [feedbackMessages, setFeedbackMessages] = useState<FeedbackMessage[]>([])
+  const [feedbackInput, setFeedbackInput] = useState("")
+  const [sendingFeedback, setSendingFeedback] = useState(false)
   const [objective, setObjective] = useState("")
   const [description, setDescription] = useState("")
   const [budget, setBudget] = useState("")
@@ -200,6 +215,8 @@ export default function CampaignsPage() {
           title: "Success",
           description: "Campaign approved and launched to platforms",
         })
+        setShowApproveDialog(false)
+        setCampaignToApprove(null)
         loadCampaigns()
       } else {
         toast({
@@ -214,6 +231,101 @@ export default function CampaignsPage() {
         description: error.message || "Failed to approve campaign",
         variant: "destructive",
       })
+    }
+  }
+
+  function openApproveDialog(campaign: Campaign) {
+    setCampaignToApprove(campaign)
+    setShowApproveDialog(true)
+  }
+
+  function openFeedbackDialog(campaign: Campaign) {
+    setSelectedCampaign(campaign)
+    setFeedbackMessages([])
+    setFeedbackInput("")
+    setShowFeedbackDialog(true)
+  }
+
+  async function handleSendFeedback() {
+    if (!feedbackInput.trim() || !selectedCampaign) return
+
+    const userMessage: FeedbackMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content: feedbackInput.trim(),
+      timestamp: new Date()
+    }
+
+    setFeedbackMessages(prev => [...prev, userMessage])
+    setFeedbackInput("")
+    setSendingFeedback(true)
+
+    try {
+      // Get active assistant
+      const assistants = await apiClient.listAssistants() as { assistants?: any[] }
+      const digitalMarketer = assistants.assistants?.find(
+        (a: any) => a.assistant_type === "digital_marketer" && a.is_active
+      )
+
+      if (!digitalMarketer) {
+        throw new Error("Digital Marketer assistant not found")
+      }
+
+      // Get campaigns capability
+      const capabilities = await apiClient.getCapabilities(digitalMarketer.id) as { capabilities?: any[] }
+      const campaignsCapability = capabilities.capabilities?.find(
+        (c: any) => c.capability_type === "campaigns"
+      )
+
+      if (!campaignsCapability) {
+        throw new Error("Campaigns capability not set up")
+      }
+
+      // Create a revision request with feedback
+      await apiClient.executeAgent({
+        assistant_id: digitalMarketer.id,
+        capability_id: campaignsCapability.id,
+        request_type: "create_campaign",
+        request_data: {
+          objective: selectedCampaign.plan?.objective || selectedCampaign.name,
+          description: selectedCampaign.description,
+          budget: selectedCampaign.total_budget,
+          duration_days: selectedCampaign.start_date && selectedCampaign.end_date
+            ? Math.ceil((new Date(selectedCampaign.end_date).getTime() - new Date(selectedCampaign.start_date).getTime()) / (1000 * 60 * 60 * 24))
+            : 30,
+          channels: selectedCampaign.channels,
+          campaign_type: selectedCampaign.campaign_type || "brand_awareness",
+          revision_feedback: feedbackInput.trim(),
+          existing_campaign_id: selectedCampaign.id
+        }
+      })
+
+      const assistantMessage: FeedbackMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "Thank you for your feedback! I'm revising the campaign based on your input. This may take a few moments...",
+        timestamp: new Date()
+      }
+
+      setFeedbackMessages(prev => [...prev, assistantMessage])
+
+      toast({
+        title: "Feedback Sent",
+        description: "The AI is revising the campaign based on your feedback.",
+      })
+
+      // Reload campaigns after a delay
+      setTimeout(() => {
+        loadCampaigns()
+      }, 2000)
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send feedback",
+        variant: "destructive",
+      })
+    } finally {
+      setSendingFeedback(false)
     }
   }
 
@@ -401,7 +513,15 @@ export default function CampaignsPage() {
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => handleApproveCampaign(campaign.id)}
+                        variant="outline"
+                        onClick={() => openFeedbackDialog(campaign)}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-1" />
+                        Provide Feedback
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => openApproveDialog(campaign)}
                       >
                         <CheckCircle2 className="h-4 w-4 mr-1" />
                         Approve & Launch
@@ -521,6 +641,137 @@ export default function CampaignsPage() {
               )}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Approval Dialog with Charge Warning */}
+      <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Approve & Launch Campaign
+            </DialogTitle>
+            <DialogDescription>
+              Please review the campaign details before approving.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Important:</strong> Approving this campaign will create actual campaigns in your integrated advertising platforms (Google Ads, Meta Ads) and will incur charges based on your campaign budget and settings.
+              </AlertDescription>
+            </Alert>
+            {campaignToApprove && (
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Campaign:</span>
+                  <span className="font-medium">{campaignToApprove.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Budget:</span>
+                  <span className="font-medium">
+                    ${campaignToApprove.total_budget?.toLocaleString() || "Not set"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Channels:</span>
+                  <span className="font-medium">
+                    {campaignToApprove.channels.map(c => c.replace("_", " ")).join(", ")}
+                  </span>
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Charges will be processed by the advertising platforms according to their billing terms. Make sure you have sufficient budget and payment methods configured.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowApproveDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => campaignToApprove && handleApproveCampaign(campaignToApprove.id)}
+              className="bg-primary"
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              I Understand, Approve Campaign
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Feedback Dialog */}
+      <Dialog open={showFeedbackDialog} onOpenChange={setShowFeedbackDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Provide Feedback & Request Revisions</DialogTitle>
+            <DialogDescription>
+              Share your feedback and the AI will revise the campaign accordingly. You can approve it once you're satisfied.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+            {feedbackMessages.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Start a conversation about this campaign</p>
+                <p className="text-sm mt-2">Share what you'd like to change or improve</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {feedbackMessages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${
+                        message.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <p className={`text-xs mt-1 ${
+                        message.role === "user" ? "text-primary-foreground/70" : "text-muted-foreground"
+                      }`}>
+                        {message.timestamp.toLocaleTimeString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="flex gap-2 border-t pt-4">
+            <Textarea
+              placeholder="Type your feedback here... (e.g., 'Make the budget allocation more balanced', 'Focus more on brand awareness', 'Adjust the ad copy tone')"
+              value={feedbackInput}
+              onChange={(e) => setFeedbackInput(e.target.value)}
+              rows={3}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.ctrlKey) {
+                  handleSendFeedback()
+                }
+              }}
+            />
+            <Button
+              onClick={handleSendFeedback}
+              disabled={!feedbackInput.trim() || sendingFeedback}
+              size="icon"
+              className="self-end"
+            >
+              {sendingFeedback ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            Press Ctrl+Enter to send
+          </p>
         </DialogContent>
       </Dialog>
     </div>

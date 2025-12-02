@@ -19,6 +19,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let cancelled = false
+    
     async function loadStats() {
       try {
         const [assistants, conversations, documents, integrations] = await Promise.all([
@@ -28,24 +30,32 @@ export default function DashboardPage() {
           apiClient.listIntegrations().catch(() => ({ integrations: [], total: 0 })),
         ])
 
-        setStats({
-          assistants: assistants.assistants?.length || 0,
-          conversations: conversations.total || 0,
-          documents: documents.total || 0,
-          integrations: integrations.total || 0,
-        })
+        if (!cancelled) {
+          setStats({
+            assistants: assistants.assistants?.length || 0,
+            conversations: conversations.total || 0,
+            documents: documents.total || 0,
+            integrations: integrations.total || 0,
+          })
+          setLoading(false)
+        }
       } catch (error: any) {
-        toast({
-          title: "Error",
-          description: "Failed to load dashboard stats",
-          variant: "destructive",
-        })
-      } finally {
-        setLoading(false)
+        if (!cancelled) {
+          toast({
+            title: "Error",
+            description: "Failed to load dashboard stats",
+            variant: "destructive",
+          })
+          setLoading(false)
+        }
       }
     }
 
     loadStats()
+    
+    return () => {
+      cancelled = true
+    }
   }, [toast])
 
   const quickActions = [

@@ -15,9 +15,9 @@ export function Navigation() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-accent to-secondary">
-              <span className="text-lg font-bold text-primary-foreground">C</span>
+              <span className="text-lg font-bold text-primary-foreground">S</span>
             </div>
-            <span className="text-xl font-bold">CODIAN</span>
+            <span className="text-xl font-bold">StaffPilot</span>
           </Link>
 
           {/* Desktop Navigation */}

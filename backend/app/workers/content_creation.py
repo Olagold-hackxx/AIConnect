@@ -17,27 +17,34 @@ async def _retrieve_rag_context_async(
     """
     Async helper function to retrieve RAG context.
     Can be called directly from async contexts.
+    Creates an async session for RAG operations (needed for async DB queries).
     """
-    from app.db.session import create_worker_session_factory
+    from app.db.session import get_async_session_local
     from app.services.rag_service import RAGService
     
-    # Create a new session factory for this worker task
-    SessionFactory = create_worker_session_factory()
-    db = SessionFactory()
-    try:
-        rag_service = RAGService(db, UUID(tenant_id))
-        chunks = await rag_service.retrieve_relevant_context(
-            query=query,
-            limit=limit,
-            assistant_id=UUID(assistant_id) if assistant_id else None
-        )
-        return {
-            "success": True,
-            "chunks": chunks,
-            "count": len(chunks)
-        }
-    finally:
-        await db.close()
+    # Create an async session for RAG operations (RAGService needs async session)
+    async_session_factory = get_async_session_local()
+    async with async_session_factory() as db:
+        try:
+            rag_service = RAGService(db, UUID(tenant_id))
+            chunks = await rag_service.retrieve_relevant_context(
+                query=query,
+                limit=limit,
+                assistant_id=UUID(assistant_id) if assistant_id else None
+            )
+            return {
+                "success": True,
+                "chunks": chunks,
+                "count": len(chunks)
+            }
+        except Exception as e:
+            logger.error(f"RAG retrieval error in async helper: {str(e)}", exc_info=True)
+            return {
+                "success": False,
+                "chunks": [],
+                "count": 0,
+                "error": str(e)
+            }
 
 
 @celery_app.task(name="rag.retrieve_context", bind=True, max_retries=3)
@@ -61,26 +68,10 @@ def retrieve_rag_context(
         Dictionary with context chunks
     """
     try:
-        # Create a new event loop for this task
-        # In Celery workers, we should not have a running loop
-        try:
-            # Try to get existing loop
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-            elif loop.is_running():
-                # If loop is running, we can't use run_until_complete
-                raise RuntimeError("Event loop is already running. Cannot use run_until_complete.")
-        except RuntimeError:
-            # No event loop exists, create a new one
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
-        chunks_result = loop.run_until_complete(
+        # Use asyncio.run() which properly manages the event loop lifecycle
+        chunks_result = asyncio.run(
             _retrieve_rag_context_async(tenant_id, assistant_id, query, limit)
         )
-        loop.close()
         
         return chunks_result
     
@@ -232,7 +223,7 @@ async def _generate_video_async(
     }
 
 
-async def _generate_content_direct(
+def _generate_content_direct(
     tenant_id: str,
     assistant_id: str,
     request: str,
@@ -260,12 +251,12 @@ async def _generate_content_direct(
     from app.models.tenant import Tenant
     from app.services.llm.factory import create_llm_service
     
-    # Create a new session factory for this worker task
+    # Create a new session factory for this worker task (sync)
     SessionFactory = create_worker_session_factory()
     db = SessionFactory()
     try:
-        # Get tenant config
-        tenant_result = await db.execute(
+        # Get tenant config (sync)
+        tenant_result = db.execute(
             select(Tenant).where(Tenant.id == UUID(tenant_id))
         )
         tenant = tenant_result.scalar_one_or_none()
@@ -326,18 +317,40 @@ IMPORTANT: Generate ONE single, final post that is ready to publish immediately.
         if platform_instruction:
             user_prompt += platform_instruction
         
-        # Get LLM service and generate content
-        llm_service = create_llm_service()
-        content = await llm_service.generate_content(
-            prompt=user_prompt,
-            system_instruction=system_prompt,
-            temperature=0.7,
-            max_tokens=1000
-        )
+        # Get LLM service and generate content (async, handle event loop properly)
+        async def _generate():
+            llm_service = create_llm_service()
+            result = await llm_service.generate_content(
+                prompt=user_prompt,
+                system_instruction=system_prompt,
+                temperature=0.7,
+                max_tokens=1000
+            )
+            # Ensure we return a string, not a coroutine
+            if isinstance(result, str):
+                return result
+            return str(result) if result else ""
         
-        return content.strip()
+        # Handle event loop properly for Celery workers
+        try:
+            # Try to get existing loop
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # Loop is running - this shouldn't happen in sync context
+                # Fall back to creating a new loop in a thread
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(asyncio.run, _generate())
+                    content = future.result()
+            else:
+                content = loop.run_until_complete(_generate())
+        except RuntimeError:
+            # No event loop exists, create a new one
+            content = asyncio.run(_generate())
+        
+        return content.strip() if content else ""
     finally:
-        await db.close()
+        db.close()  # Sync close
 
 
 @celery_app.task(name="content.generate", bind=True, max_retries=2)
@@ -361,23 +374,10 @@ def generate_content(
         Dictionary with generated content and metadata
     """
     try:
-        # Create a new event loop for this task
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-            elif loop.is_running():
-                raise RuntimeError("Event loop is already running. Cannot use run_until_complete.")
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
-        result = loop.run_until_complete(
+        # Use asyncio.run() which properly manages the event loop lifecycle
+        result = asyncio.run(
             _generate_content_async(tenant_id, assistant_id, request, context)
         )
-        loop.close()
-        
         return result
     
     except Exception as e:
@@ -404,16 +404,6 @@ def generate_image_task(
         Dictionary with image data or URLs
     """
     try:
-        # Create a new event loop for this task
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
         async def _generate():
             from app.services.llm.factory import create_llm_service
             
@@ -425,8 +415,8 @@ def generate_image_task(
             )
             return images
         
-        images = loop.run_until_complete(_generate())
-        loop.close()
+        # Use asyncio.run() which properly manages the event loop lifecycle
+        images = asyncio.run(_generate())
         
         return {
             "success": True,
@@ -456,16 +446,6 @@ def generate_video_task(
         Dictionary with video data or URL
     """
     try:
-        # Create a new event loop for this task
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
         async def _generate():
             from app.services.llm.factory import create_llm_service
             
@@ -476,8 +456,8 @@ def generate_video_task(
             )
             return video
         
-        video = loop.run_until_complete(_generate())
-        loop.close()
+        # Use asyncio.run() which properly manages the event loop lifecycle
+        video = asyncio.run(_generate())
         
         return {
             "success": True,
@@ -512,16 +492,6 @@ def upload_media_to_storage(
         Dictionary with storage URL
     """
     try:
-        # Create a new event loop for this task
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
         async def _upload():
             from app.services.storage import get_storage
             from io import BytesIO
@@ -572,8 +542,8 @@ def upload_media_to_storage(
                 )
                 return url
         
-        url = loop.run_until_complete(_upload())
-        loop.close()
+        # Use asyncio.run() which properly manages the event loop lifecycle
+        url = asyncio.run(_upload())
         
         return {
             "success": True,
@@ -888,35 +858,29 @@ def execute_content_creation(
         Execution result
     """
     try:
-        # Create a new event loop for this task
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+        # Use sync database operations - no asyncio.run() needed for DB
+        from app.db.session import create_worker_session_factory
+        from app.models.content import ContentItem
+        from app.models.integration import SocialIntegration
+        from app.models.agent_execution import AgentExecution
+        from sqlalchemy import select
+        from datetime import datetime, timezone
         
-        async def _execute():
-            from app.db.session import create_worker_session_factory
-            from app.services.agent_execution_service import AgentExecutionService
-            from app.models.content import ContentItem
-            from app.models.integration import SocialIntegration
-            from sqlalchemy import select
-            from datetime import datetime, timezone
-            
-            # Create a new session factory for this worker task
-            SessionFactory = create_worker_session_factory()
-            db = SessionFactory()
-            try:
-                execution_service = AgentExecutionService(db)
-                
-                # Update status to running
-                await execution_service.update_execution(
-                    execution_id=UUID(execution_id),
-                    status="running"
-                )
+        # Create a new session factory for this worker task (sync)
+        SessionFactory = create_worker_session_factory()
+        db = SessionFactory()
+        try:
+            # Update status to running (sync)
+            result = db.execute(
+                select(AgentExecution).where(AgentExecution.id == UUID(execution_id))
+            )
+            execution = result.scalar_one_or_none()
+            if execution:
+                execution.status = "running"
+                if not execution.started_at:
+                    execution.started_at = datetime.now(timezone.utc)
+                db.commit()
+                db.refresh(execution)
                 
                 user_request = request_data.get("request", "")
                 platforms = request_data.get("platforms", [])
@@ -937,28 +901,44 @@ def execute_content_creation(
                 logger.info("=" * 80)
                 
                 logger.info("[TASK 1/6] Starting RAG retrieval...")
-                rag_result = await _retrieve_rag_context_async(
-                    tenant_id=tenant_id,
-                    assistant_id=assistant_id,
-                    query=user_request,
-                    limit=10  # Increased from 5 to 10 for better retrieval
+                # RAG retrieval is async (uses LLM service), so use asyncio.run()
+                rag_result = asyncio.run(
+                    _retrieve_rag_context_async(
+                        tenant_id=tenant_id,
+                        assistant_id=assistant_id,
+                        query=user_request,
+                        limit=10  # Increased from 5 to 10 for better retrieval
+                    )
                 )
                 
                 context = ""
+                context_text_for_keywords = ""  # Raw text from chunks for keyword extraction
                 if rag_result.get("success") and rag_result.get("chunks"):
-                    chunks_count = len(rag_result.get("chunks", []))
+                    chunks = rag_result.get("chunks", [])
+                    chunks_count = len(chunks)
                     context_parts = ["RELEVANT CONTEXT FROM KNOWLEDGE BASE:"]
-                    for i, chunk in enumerate(rag_result["chunks"], 1):
+                    # Extract raw text from chunks for keyword research
+                    chunk_texts = []
+                    for i, chunk in enumerate(chunks, 1):
+                        chunk_content = chunk.get('content', '')
+                        chunk_texts.append(chunk_content)
                         context_parts.append(
-                            f"\n[{i}] Source: {chunk['source']}\n"
-                            f"Content: {chunk['content'][:500]}..."
+                            f"\n[{i}] Source: {chunk.get('source', 'Unknown')}\n"
+                            f"Content: {chunk_content[:500]}..."
                         )
                     context = "\n".join(context_parts)
+                    # Combine chunk texts for keyword extraction (use first 500 chars from each chunk)
+                    context_text_for_keywords = " ".join([text[:500] for text in chunk_texts])
                     tasks.append({"task": "RAG Retrieval", "status": "PASSED", "details": f"Retrieved {chunks_count} relevant chunks"})
                     logger.info(f"[TASK 1/6] ✓ PASSED - Retrieved {chunks_count} relevant chunks from knowledge base")
                 else:
-                    tasks.append({"task": "RAG Retrieval", "status": "FAILED", "details": "No chunks retrieved"})
-                    logger.warning("[TASK 1/6] ✗ FAILED - No chunks retrieved from knowledge base")
+                    chunks_count = rag_result.get("count", 0)
+                    if chunks_count > 0:
+                        tasks.append({"task": "RAG Retrieval", "status": "PASSED", "details": f"Retrieved {chunks_count} relevant chunks"})
+                        logger.info(f"[TASK 1/6] ✓ PASSED - Retrieved {chunks_count} relevant chunks from knowledge base")
+                    else:
+                        tasks.append({"task": "RAG Retrieval", "status": "FAILED", "details": "No chunks retrieved"})
+                        logger.warning("[TASK 1/6] ✗ FAILED - No chunks retrieved from knowledge base")
                 
                 # Step 2: Keyword Research
                 logger.info("[TASK 2/6] Starting keyword research...")
@@ -966,14 +946,41 @@ def execute_content_creation(
                 try:
                     from app.services.integrations.seo import SerpAPIService
                     serp_service = SerpAPIService()
-                    # Extract main topic from user request for keyword research
-                    keyword_query = user_request[:100]  # Use first 100 chars as query
-                    keyword_results = await serp_service.keyword_research(
-                        query=keyword_query,
-                        location="United States",
-                        limit=10
+                    # Use context from RAG retrieval for keyword research instead of user prompt
+                    # This ensures keywords are relevant to the actual content context
+                    if context_text_for_keywords:
+                        # Extract key terms from context text (first 200 chars to get main topics)
+                        # Remove common words and extract meaningful phrases
+                        keyword_query = context_text_for_keywords[:200].strip()
+                        # Clean up - remove extra whitespace and newlines
+                        keyword_query = " ".join(keyword_query.split())
+                        keyword_query = keyword_query[:100]  # Limit to 100 chars
+                    else:
+                        # Fallback to user request if no context available
+                        keyword_query = user_request[:100]
+                    
+                    # Keyword research is async, so use asyncio.run()
+                    keyword_results = asyncio.run(
+                        serp_service.keyword_research(
+                            query=keyword_query,
+                            location="United States",
+                            limit=10
+                        )
                     )
-                    keywords_count = len(keyword_results.get('keywords', []))
+                    keywords = keyword_results.get('keywords', [])
+                    keywords_count = len(keywords)
+                    if keywords:
+                        # Log all generated keywords
+                        keyword_list = []
+                        for k in keywords:
+                            if isinstance(k, dict):
+                                keyword_str = k.get('keyword', str(k))
+                                if 'search_volume' in k:
+                                    keyword_str += f" (vol: {k.get('search_volume', 'N/A')})"
+                                keyword_list.append(keyword_str)
+                            else:
+                                keyword_list.append(str(k))
+                        logger.info(f"[TASK 2/6] Generated keywords ({keywords_count}): {', '.join(keyword_list)}")
                     tasks.append({"task": "Keyword Research", "status": "PASSED", "details": f"Found {keywords_count} keywords"})
                     logger.info(f"[TASK 2/6] ✓ PASSED - Found {keywords_count} keywords")
                 except Exception as e:
@@ -991,7 +998,8 @@ def execute_content_creation(
                     for platform in platforms:
                         logger.info(f"[TASK 3/6] Generating content for {platform}...")
                         try:
-                            content_result = await _generate_content_direct(
+                            # Content generation (sync function that handles async LLM internally)
+                            content_result = _generate_content_direct(
                                 tenant_id=tenant_id,
                                 assistant_id=assistant_id,
                                 request=user_request,
@@ -1012,7 +1020,8 @@ def execute_content_creation(
                 else:
                     # No platforms specified, generate generic content
                     try:
-                        content_result = await _generate_content_direct(
+                        # Content generation (sync function that handles async LLM internally)
+                        content_result = _generate_content_direct(
                             tenant_id=tenant_id,
                             assistant_id=assistant_id,
                             request=user_request,
@@ -1042,11 +1051,19 @@ def execute_content_creation(
                 # Check if we have content for at least one platform
                 if not platform_contents or not any(platform_contents.values()):
                     tasks.append({"task": "Content Generation", "status": "FAILED", "details": "No content generated for any platform"})
-                    await execution_service.update_execution(
-                        execution_id=UUID(execution_id),
-                        status="failed",
-                        error_message="Content generation returned empty result for all platforms"
+                    # Update execution status (sync)
+                    result = db.execute(
+                        select(AgentExecution).where(AgentExecution.id == UUID(execution_id))
                     )
+                    execution = result.scalar_one_or_none()
+                    if execution:
+                        execution.status = "failed"
+                        execution.error_message = "Content generation returned empty result for all platforms"
+                        execution.completed_at = datetime.now(timezone.utc)
+                        if execution.started_at:
+                            delta = execution.completed_at - execution.started_at
+                            execution.execution_time_ms = int(delta.total_seconds() * 1000)
+                        db.commit()
                     logger.error("=" * 80)
                     logger.error("CONTENT CREATION EXECUTION FAILED")
                     logger.error("=" * 80)
@@ -1070,11 +1087,13 @@ def execute_content_creation(
                             if first_platform_content:
                                 image_prompt = first_platform_content[:200]  # Use first 200 chars of generated content
                         
-                        # Call async helper directly instead of Celery task
-                        image_result = await _generate_image_async(
-                            prompt=image_prompt,
-                            aspect_ratio="1:1",
-                            number_of_images=1
+                        # Image generation is async (uses LLM), so use asyncio.run()
+                        image_result = asyncio.run(
+                            _generate_image_async(
+                                prompt=image_prompt,
+                                aspect_ratio="1:1",
+                                number_of_images=1
+                            )
                         )
                         
                         if image_result.get("success"):
@@ -1082,12 +1101,15 @@ def execute_content_creation(
                             uploaded_count = 0
                             # Upload each image
                             for img in images:
-                                upload_result = await _upload_media_async(
-                                    tenant_id=tenant_id,
-                                    execution_id=execution_id,
-                                    media_type="image",
-                                    media_data=img,
-                                    filename="generated_image.png"
+                                # Media upload is async, so use asyncio.run()
+                                upload_result = asyncio.run(
+                                    _upload_media_async(
+                                        tenant_id=tenant_id,
+                                        execution_id=execution_id,
+                                        media_type="image",
+                                        media_data=img,
+                                        filename="generated_image.png"
+                                    )
                                 )
                                 
                                 if upload_result.get("success"):
@@ -1124,21 +1146,26 @@ def execute_content_creation(
                             if first_platform_content:
                                 video_prompt = first_platform_content[:200]  # Use first 200 chars of generated content
                         
-                        # Call async helper directly instead of Celery task
-                        video_result = await _generate_video_async(
-                            prompt=video_prompt,
-                            duration_seconds=30
+                        # Video generation is async (uses LLM), so use asyncio.run()
+                        video_result = asyncio.run(
+                            _generate_video_async(
+                                prompt=video_prompt,
+                                duration_seconds=30
+                            )
                         )
                         
                         if video_result.get("success"):
                             video = video_result.get("video")
                             # Upload video
-                            upload_result = await _upload_media_async(
-                                tenant_id=tenant_id,
-                                execution_id=execution_id,
-                                media_type="video",
-                                media_data=video,
-                                filename="generated_video.mp4"
+                            # Media upload is async, so use asyncio.run()
+                            upload_result = asyncio.run(
+                                _upload_media_async(
+                                    tenant_id=tenant_id,
+                                    execution_id=execution_id,
+                                    media_type="video",
+                                    media_data=video,
+                                    filename="generated_video.mp4"
+                                )
                             )
                             
                             if upload_result.get("success"):
@@ -1180,8 +1207,8 @@ def execute_content_creation(
                             })
                             continue
                         
-                        # Get integration - allow integrations without assistant_id or matching assistant_id
-                        integration_result = await db.execute(
+                        # Get integration - allow integrations without assistant_id or matching assistant_id (sync)
+                        integration_result = db.execute(
                             select(SocialIntegration).where(
                                 SocialIntegration.tenant_id == UUID(tenant_id),
                                 (SocialIntegration.assistant_id == UUID(assistant_id)) | (SocialIntegration.assistant_id.is_(None)),
@@ -1222,12 +1249,21 @@ def execute_content_creation(
                                 })
                                 continue
                             
-                            # Get default page or fall back to first page
-                            from app.services.integration_service import IntegrationService
-                            integration_service = IntegrationService(db)
-                            default_page = await integration_service.get_default_page(integration)
-                            
-                            selected_page = default_page
+                            # Get default page or fall back to first page (sync)
+                            selected_page = None
+                            if integration.pages:
+                                # Find default page (one with is_default=True)
+                                if isinstance(integration.pages, list):
+                                    for page in integration.pages:
+                                        if isinstance(page, dict) and page.get("is_default"):
+                                            selected_page = page
+                                            break
+                                    # If no default, use first page
+                                    if not selected_page and integration.pages:
+                                        selected_page = integration.pages[0]
+                                elif isinstance(integration.pages, dict):
+                                    # Single page
+                                    selected_page = integration.pages
                             if not selected_page:
                                 # Fall back to first page if no default is set
                                 selected_page = integration.pages[0] if isinstance(integration.pages, list) and integration.pages else None
@@ -1311,11 +1347,21 @@ def execute_content_creation(
                             is_organization = False
                             
                             # Get default organization or fall back to first organization
-                            from app.services.integration_service import IntegrationService
-                            integration_service = IntegrationService(db)
-                            default_org = await integration_service.get_default_page(integration)
-                            
-                            selected_org = default_org
+                            # Extract directly from integration model (sync)
+                            selected_org = None
+                            if integration.organizations:
+                                # Find default organization (one with is_default=True)
+                                if isinstance(integration.organizations, list):
+                                    for org in integration.organizations:
+                                        if isinstance(org, dict) and org.get("is_default"):
+                                            selected_org = org
+                                            break
+                                    # If no default, use first organization
+                                    if not selected_org and integration.organizations:
+                                        selected_org = integration.organizations[0]
+                                elif isinstance(integration.organizations, dict):
+                                    # Single organization
+                                    selected_org = integration.organizations
                             if not selected_org:
                                 # Fall back to first organization if no default is set
                                 selected_org = integration.organizations[0] if isinstance(integration.organizations, list) and integration.organizations else None
@@ -1433,14 +1479,17 @@ def execute_content_creation(
                             access_token_to_use = integration_data["page_access_token"]
                             logger.info(f"[{platform}] Using page access token for posting")
                         
-                        post_result = await _post_to_social_platform_async(
-                            platform=platform,
-                            content=generated_content,
-                            access_token=access_token_to_use,
-                            integration_data=integration_data,
-                            media_urls=all_media_urls if all_media_urls else None,
-                            integration=integration,
-                            db_session=db
+                        # Posting is async (uses HTTP requests), so use asyncio.run()
+                        post_result = asyncio.run(
+                            _post_to_social_platform_async(
+                                platform=platform,
+                                content=generated_content,
+                                access_token=access_token_to_use,
+                                integration_data=integration_data,
+                                media_urls=all_media_urls if all_media_urls else None,
+                                integration=integration,
+                                db_session=db
+                            )
                         )
                         
                         logger.info(f"[TASK 5/6] [{platform}] Post result: success={post_result.get('success')}, error={post_result.get('error', 'None')}")
@@ -1468,8 +1517,8 @@ def execute_content_creation(
                             db.add(content_item)
                             posting_passed += 1
                             logger.info(f"[TASK 5/6] [{platform}] ✓ PASSED - Post published successfully (ID: {post_result.get('post_id', 'N/A')})")
-                            await db.commit()
-                            await db.refresh(content_item)
+                            db.commit()  # Sync commit
+                            db.refresh(content_item)  # Sync refresh
                             
                             created_content_items.append({
                                 "id": str(content_item.id),
@@ -1538,10 +1587,18 @@ def execute_content_creation(
                         summary_content = platform_contents[platform]
                         break
                 
-                await execution_service.update_execution(
-                    execution_id=UUID(execution_id),
-                    status="completed",
-                    result={
+                # Update execution status (sync)
+                result = db.execute(
+                    select(AgentExecution).where(AgentExecution.id == UUID(execution_id))
+                )
+                execution = result.scalar_one_or_none()
+                if execution:
+                    execution.status = "completed"
+                    execution.completed_at = datetime.now(timezone.utc)
+                    if execution.started_at:
+                        delta = execution.completed_at - execution.started_at
+                        execution.execution_time_ms = int(delta.total_seconds() * 1000)
+                    execution.result = {
                         "content": summary_content,
                         "platform_contents": platform_contents,
                         "content_items": created_content_items,
@@ -1556,10 +1613,11 @@ def execute_content_creation(
                             "partial": partial_count,
                             "tasks": tasks
                         }
-                    },
-                    steps_executed=[],
-                    tools_used=[]
-                )
+                    }
+                    execution.steps_executed = []
+                    execution.tools_used = []
+                    db.commit()
+                    db.refresh(execution)
                 
                 logger.info("[TASK 6/6] ✓ PASSED - Execution completed and status updated")
                 
@@ -1570,49 +1628,37 @@ def execute_content_creation(
                     "platform_contents": platform_contents,
                     "content": summary_content
                 }
-            finally:
-                await db.close()
-        
-        result = loop.run_until_complete(_execute())
-        loop.close()
-        return result
+        finally:
+            db.close()  # Sync close
     
     except Exception as e:
+    
         logger.error(f"Content creation execution failed: {str(e)}")
         
-        # Update execution status
+        # Update execution status (sync)
         try:
-            # Create a new event loop for this task
+            from app.db.session import create_worker_session_factory
+            from app.models.agent_execution import AgentExecution
+            from sqlalchemy import select
+            
+            SessionFactory = create_worker_session_factory()
+            db = SessionFactory()
             try:
-                update_loop = asyncio.get_event_loop()
-                if update_loop.is_closed():
-                    update_loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(update_loop)
-            except RuntimeError:
-                update_loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(update_loop)
-            
-            async def _update():
-                from app.db.session import create_worker_session_factory
-                from app.services.agent_execution_service import AgentExecutionService
-                
-                # Create a new session factory for this worker task
-                SessionFactory = create_worker_session_factory()
-                db = SessionFactory()
-                try:
-                    execution_service = AgentExecutionService(db)
-                    await execution_service.update_execution(
-                        execution_id=UUID(execution_id),
-                        status="failed",
-                        error_message=str(e)
-                    )
-                finally:
-                    await db.close()
-            
-            update_loop.run_until_complete(_update())
-            update_loop.close()
+                result = db.execute(
+                    select(AgentExecution).where(AgentExecution.id == UUID(execution_id))
+                )
+                execution = result.scalar_one_or_none()
+                if execution:
+                    execution.status = "failed"
+                    execution.error_message = str(e)
+                    execution.completed_at = datetime.now(timezone.utc)
+                    if execution.started_at:
+                        delta = execution.completed_at - execution.started_at
+                        execution.execution_time_ms = int(delta.total_seconds() * 1000)
+                    db.commit()
+            finally:
+                db.close()  # Sync close
         except Exception as update_error:
             logger.error(f"Failed to update execution status: {str(update_error)}")
         
         raise self.retry(exc=e, countdown=120)
-

@@ -11,8 +11,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "CODIAN - AI Consultant & Manager Service",
-  description: "Done-for-you AI setup, integration, and deployment service",
+  title: "StaffPilot — The AI Employee Company",
+  description: "Hire an AI employee that works 24/7 for a fraction of the cost. StaffPilot gives you AI employees with human personas for marketing, support, operations, and more.",
   generator: "v0.app",
 }
 

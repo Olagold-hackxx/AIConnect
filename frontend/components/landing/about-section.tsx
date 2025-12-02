@@ -6,15 +6,11 @@ export function AboutSection() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mb-6 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-balance">
-            Complete Setup, Expert Guidance
+            Replace 100+ Hours of Work Every Month With a Single AI Employee
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed text-pretty">
-            CODIAN handles all the technical heavy lifting — setup, integration, and deployment. Then, your dedicated
-            account manager helps you leverage the AI effectively for your specific business needs.
-          </p>
-          <p className="mt-6 text-lg text-muted-foreground leading-relaxed text-pretty">
-            No technical expertise required. No configuration headaches. Just powerful AI working for your business with
-            expert guidance every step of the way.
+            Our AI employees handle the tasks that drain your time, money, and energy — from digital marketing and
+            customer support to admin, outreach, and operations. All done instantly, accurately, and 24/7.
           </p>
         </div>
 
@@ -36,10 +32,10 @@ export function AboutSection() {
                 />
               </svg>
             </div>
-            <h3 className="mb-3 text-xl font-semibold">Complete Setup</h3>
+            <h3 className="mb-3 text-xl font-semibold">Growth & Marketing</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Our team handles all technical setup, integration with your systems, and deployment. You don't touch any
-              code or configuration.
+              Digital marketing, content creation, social media, lead generation, and outreach — handled by your AI
+              employee so you can focus on strategy and vision.
             </p>
           </div>
 
@@ -54,10 +50,10 @@ export function AboutSection() {
                 />
               </svg>
             </div>
-            <h3 className="mb-3 text-xl font-semibold">Expert Guidance</h3>
+            <h3 className="mb-3 text-xl font-semibold">Support & Operations</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Your dedicated account manager helps you maximize AI value for your business — from strategy to
-              optimization to ongoing support.
+              Customer support, executive assistance, appointment setting, back-office tasks, and workflow automation —
+              delegated to an AI employee that never needs a break.
             </p>
           </div>
 
@@ -67,10 +63,10 @@ export function AboutSection() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
-            <h3 className="mb-3 text-xl font-semibold">Business Growth</h3>
+            <h3 className="mb-3 text-xl font-semibold">Built For Scale</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Focus on growing your business while AI handles repetitive work. Scale operations without expanding your
-              team.
+              Scale your business without hiring headaches. Add AI employees as you grow — each with a human persona,
+              industry-trained workflows, and performance guarantees.
             </p>
           </div>
         </div>

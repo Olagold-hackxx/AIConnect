@@ -2,16 +2,26 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
-    // !! WARN !!
     ignoreBuildErrors: false,
+  },
+  // Performance optimizations
+  reactStrictMode: true,
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
+  // Optimize images
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
+  // Enable compression
+  compress: true,
+  // Optimize bundle
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
 };
 

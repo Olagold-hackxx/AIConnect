@@ -2,7 +2,7 @@
 
 import { Suspense, useRef, useState } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import { OrbitControls, Environment, PerspectiveCamera, Float, Text } from "@react-three/drei"
+import { OrbitControls, PerspectiveCamera, Float, Text } from "@react-three/drei"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles } from "lucide-react"
 import * as THREE from "three"
@@ -352,7 +352,7 @@ export function Scene() {
       
       <AIRobot />
       
-      <Environment preset="city" />
+      {/* Environment removed - using manual lighting instead to avoid HDR file dependency */}
     </>
   )
 }

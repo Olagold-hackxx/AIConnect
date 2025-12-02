@@ -1,6 +1,12 @@
 """
 FastAPI application entry point
 """
+import os
+# Disable ChromaDB telemetry before any imports
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+os.environ["CHROMA_TELEMETRY_DISABLED"] = "1"
+os.environ["POSTHOG_DISABLED"] = "1"
+
 from fastapi import FastAPI, Request, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse

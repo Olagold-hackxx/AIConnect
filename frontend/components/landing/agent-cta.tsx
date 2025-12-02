@@ -117,25 +117,30 @@ export function AgentCTA() {
         <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 p-8 sm:p-12 lg:p-16">
           <div className="relative z-10 grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
-              <h2 className="mb-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl">Ready to Get Started?</h2>
+              <h2 className="mb-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+                Free Business Efficiency Audit
+              </h2>
               <p className="mb-8 text-pretty text-lg text-muted-foreground">
-                Talk to one of our AI specialists to learn how CODIAN can transform your business operations. We'll
-                handle everything from setup to ongoing management.
+                Find out exactly where an AI employee will save you time, money, and team stress. Get an efficiency
+                score, savings estimate, role recommendation, and workflow suggestions — before you pay a single dollar.
               </p>
 
               <div className="flex flex-col gap-4 sm:flex-row">
                 <Button size="lg" className="ai-gradient group" onClick={openChatbot}>
                   <MessageCircle className="mr-2 h-5 w-5" />
-                  Chat with an Agent
+                  Book Free Audit
                 </Button>
-                <Button size="lg" variant="outline" className="backdrop-blur-sm bg-transparent">
+                <Button size="lg" variant="outline" className="backdrop-blur-sm bg-transparent" asChild>
+                  <Link href="/pricing">
                   <Phone className="mr-2 h-5 w-5" />
-                  Schedule a Call
+                    Start Free 7-Day Trial
+                  </Link>
                 </Button>
               </div>
 
               <p className="mt-6 text-sm text-muted-foreground">
-                Available Monday-Friday, 9am-6pm EST. Average response time: under 2 hours.
+                Limited availability: to ensure high-quality onboarding, we only accept a limited number of new
+                businesses each month.
               </p>
             </div>
 

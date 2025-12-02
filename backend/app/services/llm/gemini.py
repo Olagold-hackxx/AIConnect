@@ -96,34 +96,75 @@ class GeminiService(BaseLLMService):
                 generation_config=generation_config
             )
             
-            # Extract text from response - handle both simple and complex responses
-            try:
-                # Try simple text accessor first
-                return response.text
-            except (ValueError, AttributeError) as e:
-                # If that fails, extract from parts or candidates
-                text_parts = []
-                
-                # Try response.parts first
-                if hasattr(response, 'parts') and response.parts:
-                    for part in response.parts:
-                        if hasattr(part, 'text') and part.text:
-                            text_parts.append(part.text)
-                
-                # Try response.candidates[0].content.parts
-                if not text_parts and hasattr(response, 'candidates') and response.candidates:
-                    for candidate in response.candidates:
-                        if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+            # Extract text from response - handle multiple response structures
+            text_parts = []
+            
+            # Method 1: Try response.candidates[0].content.parts (most common structure)
+            if hasattr(response, 'candidates') and response.candidates:
+                for candidate in response.candidates:
+                    if hasattr(candidate, 'content'):
+                        # Check candidate.content.parts
+                        if hasattr(candidate.content, 'parts') and candidate.content.parts:
                             for part in candidate.content.parts:
                                 if hasattr(part, 'text') and part.text:
-                                    text_parts.append(part.text)
-                
-                if text_parts:
-                    return ''.join(text_parts)
-                else:
-                    # If still no text, try to get any string representation
-                    error_msg = str(e) if e else "No text content found in response"
-                    raise Exception(f"Failed to extract text from response: {error_msg}")
+                                    text_parts.append(str(part.text))
+                        # Check if candidate.content has text directly
+                        elif hasattr(candidate.content, 'text') and candidate.content.text:
+                            text_parts.append(str(candidate.content.text))
+                    # Check if candidate has text directly
+                    elif hasattr(candidate, 'text') and candidate.text:
+                        text_parts.append(str(candidate.text))
+            
+            # Method 2: Try response.parts as fallback
+            if not text_parts and hasattr(response, 'parts') and response.parts:
+                for part in response.parts:
+                    if hasattr(part, 'text') and part.text:
+                        text_parts.append(str(part.text))
+            
+            # Method 3: Try response.content.parts
+            if not text_parts and hasattr(response, 'content'):
+                if hasattr(response.content, 'parts') and response.content.parts:
+                    for part in response.content.parts:
+                        if hasattr(part, 'text') and part.text:
+                            text_parts.append(str(part.text))
+                elif hasattr(response.content, 'text') and response.content.text:
+                    text_parts.append(str(response.content.text))
+            
+            # Method 4: Try response.text as last resort (works for simple responses)
+            if not text_parts:
+                try:
+                    if hasattr(response, 'text') and response.text:
+                        text_parts.append(str(response.text))
+                except Exception as text_error:
+                    logger.debug(f"response.text access failed (expected for multi-part): {text_error}")
+            
+            # Method 5: Try to get text from first candidate directly
+            if not text_parts and hasattr(response, 'candidates') and response.candidates:
+                first_candidate = response.candidates[0]
+                # Try various attributes
+                for attr in ['text', 'content', 'output', 'message']:
+                    if hasattr(first_candidate, attr):
+                        attr_value = getattr(first_candidate, attr)
+                        if isinstance(attr_value, str) and attr_value.strip():
+                            text_parts.append(attr_value)
+                        elif hasattr(attr_value, 'text') and attr_value.text:
+                            text_parts.append(str(attr_value.text))
+            
+            # If we found text in any method, return it
+            if text_parts:
+                result = ''.join(text_parts).strip()
+                if result:
+                    return result
+            
+            # Last resort: Log the response structure for debugging
+            logger.error(f"Failed to extract text from Gemini response. Response structure: {type(response)}, attributes: {dir(response)}")
+            if hasattr(response, 'candidates'):
+                logger.error(f"Candidates: {response.candidates}")
+            if hasattr(response, 'parts'):
+                logger.error(f"Parts: {response.parts}")
+            
+            # If we get here, no text was found
+            raise Exception("Failed to extract text from response: No text content found in response parts. Response may be empty or contain non-text content.")
             
         except Exception as e:
             logger.error(f"Gemini content generation failed: {str(e)}")

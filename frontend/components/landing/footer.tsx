@@ -8,13 +8,13 @@ export function Footer() {
           <div>
             <Link href="/" className="mb-4 flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-accent to-secondary">
-                <span className="text-sm font-bold text-primary-foreground">C</span>
+                <span className="text-sm font-bold text-primary-foreground">S</span>
               </div>
-              <span className="text-lg font-bold">CODIAN</span>
+              <span className="text-lg font-bold">StaffPilot</span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              AI Consultant & Manager service with dedicated account managers who handle all your AI setup, integration,
-              and deployment.
+              The AI Employee Company. Hire AI employees with human personas for marketing, support, and operations — at
+              a fraction of the cost of traditional hiring.
             </p>
           </div>
 
@@ -23,7 +23,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/services" className="transition-colors hover:text-foreground">
-                  AI Assistants
+                  AI Employees
                 </Link>
               </li>
               <li>
@@ -32,8 +32,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/account-management" className="transition-colors hover:text-foreground">
-                  Account Management
+                <Link href="/contact" className="transition-colors hover:text-foreground">
+                  Book Free Audit
                 </Link>
               </li>
             </ul>
@@ -57,11 +57,21 @@ export function Footer() {
                   Contact
                 </Link>
               </li>
+              <li>
+                <Link href="/careers" className="transition-colors hover:text-foreground">
+                  Careers
+                </Link>
+              </li>
+              <li>
+                <Link href="/press" className="transition-colors hover:text-foreground">
+                  Press
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="mb-4 text-sm font-semibold">Legal</h3>
+            <h3 className="mb-4 text-sm font-semibold">Legal & Resources</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/privacy" className="transition-colors hover:text-foreground">
@@ -70,7 +80,22 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/terms" className="transition-colors hover:text-foreground">
-                  Terms of Service
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link href="/refund-policy" className="transition-colors hover:text-foreground">
+                  Refund Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" className="transition-colors hover:text-foreground">
+                  Start Free Trial
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="transition-colors hover:text-foreground">
+                  Book Free Audit
                 </Link>
               </li>
             </ul>
@@ -78,7 +103,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 border-t border-border/40 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 CODIAN. All rights reserved.</p>
+          <p>&copy; 2025 StaffPilot. All rights reserved.</p>
         </div>
       </div>
     </footer>

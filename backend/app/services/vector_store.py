@@ -3,8 +3,13 @@ Vector Store Service using ChromaDB
 """
 import os
 import hashlib
-# Disable ChromaDB telemetry before importing chromadb
-os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
+
+# Disable ChromaDB telemetry BEFORE importing chromadb
+# Force set these environment variables to ensure telemetry is disabled
+os.environ["ANONYMIZED_TELEMETRY"] = "False"
+os.environ["CHROMA_TELEMETRY_DISABLED"] = "1"
+# Also disable posthog telemetry (used by ChromaDB)
+os.environ["POSTHOG_DISABLED"] = "1"
 
 import chromadb
 from chromadb.config import Settings as ChromaSettings
