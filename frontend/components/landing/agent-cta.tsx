@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { MessageCircle, Phone } from "lucide-react"
 import { useChatbot } from "@/components/chatbot-context"
