@@ -76,8 +76,7 @@ export function Hero3D() {
           </h1>
 
           <p className="mb-8 sm:mb-10 max-w-2xl text-pretty text-base sm:text-lg text-muted-foreground lg:text-xl px-2">
-            Smarter than a virtual assistant. Faster than a full-time employee. Meet StaffPilot — your new AI-powered
-            team member with a human persona. The fastest, easiest way to scale your business without hiring headaches.
+            Smarter than a virtual assistant. Faster than a full-time employee. The fastest, easiest way to scale your business without hiring headaches.
           </p>
 
           <div className="flex flex-col items-center gap-4 sm:flex-row">

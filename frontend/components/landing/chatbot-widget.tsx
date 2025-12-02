@@ -22,10 +22,8 @@ export function ChatbotWidget() {
 
   // Close chat whenever the route changes (e.g. user clicks to another page)
   useEffect(() => {
-    if (isOpen) {
-      closeChatbot()
-    }
-  }, [pathname, isOpen, closeChatbot])
+    closeChatbot()
+  }, [pathname, closeChatbot])
 
   // Add welcome message if no messages exist
   const displayMessages = messages.length === 0 ? [
