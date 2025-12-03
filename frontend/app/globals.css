@@ -39,35 +39,35 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* Updated dark mode to use chocolate grey/black colors */
+/* Dark mode: Dark gray background with neon accents (Retro Pop Art + Modern Dark UI) */
 .dark {
-  --background: oklch(0.09 0.01 30);
-  --foreground: oklch(0.98 0.005 200);
-  --card: oklch(0.13 0.01 30);
-  --card-foreground: oklch(0.98 0.005 200);
-  --popover: oklch(0.13 0.01 30);
-  --popover-foreground: oklch(0.98 0.005 200);
-  --primary: oklch(0.55 0.2 264);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.45 0.18 200);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.18 0.01 30);
-  --muted-foreground: oklch(0.65 0.01 200);
-  --accent: oklch(0.5 0.2 280);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: #101010; /* Dark gray */
+  --foreground: #ffffff; /* Pure white for headings */
+  --card: rgba(255, 255, 255, 0.05); /* Glassmorphic cards */
+  --card-foreground: #ffffff;
+  --popover: rgba(255, 255, 255, 0.05);
+  --popover-foreground: #ffffff;
+  --primary: #2563EB; /* Electric blue for CTAs */
+  --primary-foreground: #ffffff;
+  --secondary: #A855F7; /* Purple neon */
+  --secondary-foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.1);
+  --muted-foreground: #d1d5db; /* Light grey for body text */
+  --accent: #EC4899; /* Fuchsia neon */
+  --accent-foreground: #ffffff;
   --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.22 0.01 30);
-  --input: oklch(0.22 0.01 30);
-  --ring: oklch(0.55 0.2 264);
-  --sidebar: oklch(0.16 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.55 0.2 264);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.22 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.25 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.2); /* Thin white borders for glassmorphism */
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #2563EB;
+  --sidebar: #000000;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #2563EB;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(255, 255, 255, 0.05);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #2563EB;
 }
 
 @theme inline {
@@ -184,8 +184,16 @@
   }
 }
 
+/* Neon gradient for CTAs and accents */
 .ai-gradient {
-  background: linear-gradient(135deg, oklch(0.35 0.15 264) 0%, oklch(0.45 0.18 280) 50%, oklch(0.55 0.2 200) 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #A855F7 50%, #EC4899 100%);
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.4), 0 0 40px rgba(168, 85, 247, 0.2);
+}
+
+.ai-gradient:hover {
+  box-shadow: 0 0 30px rgba(37, 99, 235, 0.6), 0 0 60px rgba(168, 85, 247, 0.3);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }
 
 .ai-gradient-subtle {
@@ -251,9 +259,44 @@
 .gradient-orb-3 {
   width: 350px;
   height: 350px;
-  background: radial-gradient(circle, oklch(0.35 0.15 264) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, transparent 70%);
   top: 40%;
   left: 50%;
   transform: translateX(-50%);
   animation-delay: 4s;
+}
+
+/* Glassmorphism utility classes */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.2), 0 0 0 1px rgba(168, 85, 247, 0.1);
+}
+
+/* Neon glow effects */
+.neon-glow-blue {
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.5), 0 0 40px rgba(37, 99, 235, 0.3);
+}
+
+.neon-glow-purple {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.5), 0 0 40px rgba(168, 85, 247, 0.3);
+}
+
+.neon-glow-fuchsia {
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.5), 0 0 40px rgba(236, 72, 153, 0.3);
+}
+
+/* Retro pop-art halftone pattern */
+.halftone-pattern {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.3) 1px, transparent 1px);
+  background-size: 8px 8px;
+  opacity: 0.3;
 }

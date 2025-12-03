@@ -4,7 +4,7 @@ import Link from "next/link"
 
 const personas = [
   {
-    role: "AI Marketer “Mia”",
+    role: "AI Marketer",
     name: "Mia",
     description: "Friendly, creative, social-media smart. Perfect for ads, content, and branding tasks.",
     image: "/ai-assistant-digital-marketer.jpg",
@@ -12,7 +12,7 @@ const personas = [
     textColor: "text-orange-900",
   },
   {
-    role: "AI Support Agent “Eli”",
+    role: "AI Support Agent",
     name: "Eli",
     description: "Calm, patient, human-like responses. Handles support, tickets, and customer care 24/7.",
     image: "/ai-assistant-customer-support.jpg",
@@ -20,38 +20,38 @@ const personas = [
     textColor: "text-pink-900",
   },
   {
-    role: "AI Executive Assistant “Ava”",
+    role: "AI Executive Assistant",
     name: "Ava",
     description: "Organised, detail-oriented. Manages your calendar, inbox, documents, and admin.",
     image: "/ai-assistant-executive.jpg",
     bgGradient: "from-orange-400 via-pink-400 to-orange-500",
     textColor: "text-orange-900",
-  },
+  }
 ]
 
 export function AIPersonas3D() {
   return (
-    <section id="personas" className="relative py-24 sm:py-32">
+    <section id="personas" className="relative py-8 sm:py-12" style={{ backgroundColor: '#101010' }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16 text-center">
-          <h2 className="mb-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+          <h2 className="mb-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-white">
             Meet Your{" "}
-            <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#2563EB] via-[#A855F7] to-[#EC4899] bg-clip-text text-transparent">
               AI Team
             </span>
           </h2>
-          <p className="mx-auto max-w-2xl text-pretty text-lg text-muted-foreground">
+          <p className="mx-auto max-w-2xl text-pretty text-lg text-gray-300">
             Get to know the AI employees that work like real people — with personality, professionalism, and precision.
           </p>
         </div>
 
         {/* Persona Cards Grid */}
-        <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {personas.map((persona, index) => (
             <Link
               key={persona.name}
               href="/services"
-              className="group relative overflow-hidden rounded-3xl border border-border bg-card shadow-lg transition-all duration-500 hover:scale-105 hover:shadow-2xl"
+              className="group relative overflow-hidden rounded-3xl glass-card shadow-lg transition-all duration-500 hover:scale-105 hover:shadow-2xl"
               style={{
                 animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
               }}
@@ -81,21 +81,23 @@ export function AIPersonas3D() {
               </div>
 
               {/* Content */}
-              <div className="p-6">
-                <h3 className="mb-3 text-2xl font-bold">{persona.role}</h3>
-                <p className="text-pretty text-muted-foreground">{persona.description}</p>
+              <div className="p-6 bg-black/50">
+                <h3 className="mb-1 text-xl font-bold text-white">AI {persona.role} "{persona.name}"</h3>
+                <p className="text-pretty text-gray-300">{persona.description}</p>
 
-                {/* Hover Indicator */}
-                <div className="mt-4 flex items-center gap-2 text-sm font-medium text-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                  <span>Learn more</span>
-                  <svg
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                {/* CTA Button */}
+                <div className="mt-4">
+                  <Link href="/services" className="inline-flex items-center gap-2 text-sm font-medium text-[#2563EB] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    <span>Meet Your AI Employee</span>
+                    <svg
+                      className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
                 </div>
               </div>
 

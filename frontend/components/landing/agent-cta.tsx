@@ -113,25 +113,25 @@ export function AgentCTA() {
   const { openChatbot } = useChatbot()
 
   return (
-    <section className="py-24 sm:py-32">
+    <section className="py-24 sm:py-32" style={{ backgroundColor: '#101010' }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 p-8 sm:p-12 lg:p-16">
+        <div className="relative overflow-hidden rounded-3xl glass-card p-8 sm:p-12 lg:p-16">
           <div className="relative z-10 grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
-              <h2 className="mb-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+              <h2 className="mb-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-white">
                 Free Business Efficiency Audit
               </h2>
-              <p className="mb-8 text-pretty text-lg text-muted-foreground">
+              <p className="mb-8 text-pretty text-lg text-gray-300">
                 Find out exactly where an AI employee will save you time, money, and team stress. Get an efficiency
                 score, savings estimate, role recommendation, and workflow suggestions — before you pay a single dollar.
               </p>
 
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Button size="lg" className="ai-gradient group" onClick={openChatbot}>
+                <Button size="lg" className="bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue group" onClick={openChatbot}>
                   <MessageCircle className="mr-2 h-5 w-5" />
                   Book Free Audit
                 </Button>
-                <Button size="lg" variant="outline" className="backdrop-blur-sm bg-transparent" asChild>
+                <Button size="lg" variant="outline" className="glass-card border-white/20 text-white hover:bg-white/10" asChild>
                   <Link href="/pricing">
                   <Phone className="mr-2 h-5 w-5" />
                     Start Free 7-Day Trial
@@ -139,7 +139,7 @@ export function AgentCTA() {
                 </Button>
               </div>
 
-              <p className="mt-6 text-sm text-muted-foreground">
+              <p className="mt-6 text-sm text-gray-400">
                 Limited availability: to ensure high-quality onboarding, we only accept a limited number of new
                 businesses each month.
               </p>
@@ -148,15 +148,15 @@ export function AgentCTA() {
             <div className="relative">
               <AccountManagerCarousel />
               <div className="mt-4 text-center">
-                <p className="text-lg font-semibold">Your Dedicated Account Managers</p>
-                <p className="mt-2 text-sm text-muted-foreground">Expert support every step of the way</p>
+                <p className="text-lg font-semibold text-white">Your Dedicated Account Managers</p>
+                <p className="mt-2 text-sm text-gray-300">Expert support every step of the way</p>
               </div>
             </div>
           </div>
 
-          {/* Decorative gradient blobs */}
-          <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
-          <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-secondary/20 blur-3xl" />
+          {/* Decorative neon gradient blobs */}
+          <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-[#2563EB]/20 blur-3xl" />
+          <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-[#EC4899]/20 blur-3xl" />
         </div>
       </div>
     </section>

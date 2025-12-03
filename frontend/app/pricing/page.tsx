@@ -14,50 +14,47 @@ const pricingPlans = [
   {
     id: "self-setup",
     name: "Tier 1 — Self-Setup",
-    price: "$59–$149",
+    price: "$59",
     period: "month",
-    description: "For DIY founders and fast executors.",
+    description: "Perfect for fast movers and budget-conscious entrepreneurs.",
     features: [
       "Full AI employee",
       "Templates & workflows",
-      "Personas included",
+      "Personas",
       "Unlimited tasks",
       "Email support",
-      "7-day free trial included",
     ],
     popular: false,
   },
   {
     id: "managed",
     name: "Tier 2 — Managed",
-    price: "$299–$599",
+    price: "$299",
     period: "month",
-    description: "We set up, optimise, and improve everything weekly.",
+    description: "Our team sets everything up and performs weekly optimisations.",
     features: [
-      "Everything in Self-Setup",
+      "Everything in Tier 1 plus:",
       "Human account manager",
       "Weekly improvements",
       "Monthly analytics reports",
       "Priority support",
       "Personalised optimisation",
-      "7-day free trial included",
     ],
     popular: true,
   },
   {
     id: "dedicated",
-    name: "Tier 3 — Dedicated Manager",
-    price: "$1,500–$4,000",
+    name: "Tier 3 — Dedicated Human Manager",
+    price: "$1,500",
     period: "month",
-    description: "Your own human expert + AI employee. Full-time support and pro-level automation.",
+    description: "A full-time human expert + your AI employee = unstoppable force.",
     features: [
-      "Everything in Managed",
+      "Everything in Tier 2 plus:",
       "Dedicated expert",
       "Unlimited custom automations",
       "White-glove onboarding",
       "Full operational support",
       "Priority implementation",
-      "7-day free trial included",
     ],
     popular: false,
   },
@@ -135,14 +132,16 @@ export default function PricingPage() {
         </RadioGroup>
 
         <div className="mt-8 flex flex-col items-center gap-4 text-center">
-          <Button size="lg" onClick={handleContinue} className="min-w-[220px] ai-gradient">
+          <Button size="lg" onClick={handleContinue} className="min-w-[220px] bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue">
             Start Free 7-Day Trial
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
-          <p className="max-w-xl text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">Performance Guarantee:</span> If you don’t see measurable
-            improvements within 30 days, we optimise your AI setup for free until you do.
-          </p>
+          <div className="max-w-xl text-center">
+            <h3 className="text-xl font-semibold text-white mb-2">Guarantee:</h3>
+            <p className="text-sm text-gray-300">
+              If you don't see measurable improvements within 30 days, we optimise your AI setup for free until you do.
+            </p>
+          </div>
         </div>
       </div>
     </PageLayout>

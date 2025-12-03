@@ -10,8 +10,8 @@ export default function ServicesPage() {
   return (
     <PageLayout>
       <PageHeader
-        title="AI Employees Built for Real Business Work"
-        description="Choose the AI role you need — each one comes with a human persona, specialised workflows, and industry-trained capabilities. All roles include a free 7-day trial and setup guidance."
+        title="AI Employees Built for Real Businesses"
+        description="Each one comes with a human persona, specialised workflows, and industry-trained capabilities. All roles include a free 7-day trial and setup guidance."
       />
 
       <div className="py-16">
@@ -21,9 +21,10 @@ export default function ServicesPage() {
         {/* Core Roles */}
         <div className="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold">Choose the AI Role You Need</h2>
-            <p className="text-lg text-muted-foreground">
-              Deploy AI employees that talk, think, and work like real team members — without the hiring headaches.
+            <h2 className="mb-4 text-3xl font-bold text-white">Choose the AI Role You Need</h2>
+            <p className="text-lg text-gray-300">
+              Each one comes with a human persona, specialised workflows, and industry-trained capabilities.
+              All roles include a free 7-day trial and setup guidance.
             </p>
           </div>
 
@@ -32,7 +33,7 @@ export default function ServicesPage() {
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                   <Sparkles className="h-6 w-6 text-primary" />
-                </div>
+            </div> 
                 <CardTitle>AI Digital Marketer</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
@@ -44,8 +45,8 @@ export default function ServicesPage() {
                   <li>• SEO content</li>
                   <li>• Email marketing</li>
                 </ul>
-                <Button className="mt-4 w-full ai-gradient" asChild>
-                  <Link href="/pricing">Deploy AI Marketer (7-Day Free Trial)</Link>
+                <Button className="mt-4 w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
+                  <Link href="/pricing">Deploy AI Marketer (7 day Free Trial)</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -54,7 +55,7 @@ export default function ServicesPage() {
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10">
                   <HeadphonesIcon className="h-6 w-6 text-secondary" />
-                </div>
+            </div>
                 <CardTitle>AI Customer Support Agent</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
@@ -66,7 +67,7 @@ export default function ServicesPage() {
                   <li>• Order updates &amp; customer nurturing</li>
                   <li>• Complaint resolution</li>
                 </ul>
-                <Button className="mt-4 w-full ai-gradient" asChild>
+                <Button className="mt-4 w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
                   <Link href="/pricing">Deploy AI Support Agent (Free Trial)</Link>
                 </Button>
               </CardContent>
@@ -76,7 +77,7 @@ export default function ServicesPage() {
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
                   <Users className="h-6 w-6 text-accent" />
-                </div>
+            </div>
                 <CardTitle>AI Executive Assistant</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
@@ -88,7 +89,7 @@ export default function ServicesPage() {
                   <li>• Document creation</li>
                   <li>• Task management</li>
                 </ul>
-                <Button className="mt-4 w-full ai-gradient" asChild>
+                <Button className="mt-4 w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
                   <Link href="/pricing">Deploy AI Executive Assistant (Free Trial)</Link>
                 </Button>
               </CardContent>
@@ -109,13 +110,13 @@ export default function ServicesPage() {
                   <li>• Follow-ups &amp; pipeline management</li>
                   <li>• Sales call prep</li>
                 </ul>
-                <Button className="mt-4 w-full ai-gradient" asChild>
+                <Button className="mt-4 w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
                   <Link href="/pricing">Deploy AI Business Development Rep (Free Trial)</Link>
                 </Button>
               </CardContent>
             </Card>
           </div>
-        </div>
+            </div>
 
         {/* Custom AI & Free Audit */}
         <div className="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -124,15 +125,14 @@ export default function ServicesPage() {
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                   <Sparkles className="h-6 w-6 text-primary" />
-                </div>
+            </div>
                 <CardTitle>Custom AI Employees</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
                 <p>
-                  Have a unique workflow or role in mind? We’ll build a custom AI worker trained specifically for your
-                  processes, tools, and playbooks.
+                  Have a unique need? We'll build a custom AI worker trained specifically for your workflow.
                 </p>
-                <Button className="mt-4 w-full ai-gradient" asChild>
+                <Button className="mt-4 w-full bg-[#A855F7] hover:bg-[#8b5cf6] text-white neon-glow-purple" asChild>
                   <Link href="/contact">Build a Custom AI Employee</Link>
                 </Button>
               </CardContent>
@@ -142,13 +142,12 @@ export default function ServicesPage() {
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10">
                   <CheckCircle2 className="h-6 w-6 text-secondary" />
-                </div>
+            </div>
                 <CardTitle>Free Business Efficiency Audit</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
                 <p>
-                  Not sure which AI employee you need? Get a free business audit to identify your best role, biggest
-                  savings, and highest-impact workflows.
+                  Not sure which AI employee you need? Get a free business audit to identify your best role, biggest savings, and highest-impact workflows.
                 </p>
                 <ul className="space-y-1">
                   <li>✓ Efficiency score</li>
@@ -156,7 +155,7 @@ export default function ServicesPage() {
                   <li>✓ Role recommendation</li>
                   <li>✓ Workflow suggestions</li>
                 </ul>
-                <Button className="mt-4 w-full ai-gradient" asChild>
+                <Button className="mt-4 w-full bg-[#EC4899] hover:bg-[#be185d] text-white neon-glow-fuchsia" asChild>
                   <Link href="/contact">Book Free Audit</Link>
                 </Button>
               </CardContent>

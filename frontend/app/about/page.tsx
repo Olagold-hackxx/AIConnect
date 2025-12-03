@@ -16,142 +16,95 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <PageLayout>
-      <PageHeader
-        title="We’re Building the Future of Work"
-        description="Businesses are drowning in tasks and burned by rising costs. StaffPilot gives you a high-performing team member without the high-performing price tag."
-      />
-
+     
+      
       <div className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Hero / Mission */}
           <div className="mb-16 text-center">
-            <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              AI Employees With a{" "}
-              <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-                Human Touch
-              </span>
+            <h1 className="mb-6 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white">
+              We're Building the Future of Work
             </h1>
-            <p className="mx-auto max-w-3xl text-lg text-muted-foreground">
-              StaffPilot was built for founders and teams who want the output of a full-time hire — without the payroll,
-              overhead, or hiring headaches. Our mission is simple: put a reliable, high-performing AI employee inside
-              every business on earth.
+            <p className="mx-auto max-w-3xl text-lg text-gray-300">
+              Businesses are drowning in tasks, overwhelmed by hiring, and burned by rising costs.
+              Our mission is simple: give every business a high-performing team member without the high-performing price tag.
             </p>
           </div>
 
           {/* AI With a Human Touch */}
           <div className="mb-16">
-            <h2 className="mb-8 text-center text-3xl font-bold">AI With a Human Touch</h2>
+            <h2 className="mb-8 text-center text-3xl font-bold text-white">AI With a Human Touch</h2>
+            <p className="mb-8 text-center text-lg text-gray-300 max-w-3xl mx-auto">
+              Every StaffPilot AI employee is equipped with:
+            </p>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
+              <Card className="glass-card border-white/10">
                 <CardHeader>
-                  <Sparkles className="mb-4 h-8 w-8 text-primary" />
-                  <CardTitle>Human-Like Personas</CardTitle>
+                  <Sparkles className="mb-4 h-8 w-8 text-[#2563EB]" />
+                  <CardTitle className="text-white">A human-like persona</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>
-                    Every StaffPilot AI employee comes with a human-like persona, conversational intelligence, and
-                    professional behaviour. It feels like hiring a real team member — just faster, cheaper, and always
-                    on.
+                  <CardDescription className="text-gray-300">
+                    Conversational intelligence
                   </CardDescription>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-card border-white/10">
                 <CardHeader>
-                  <TrendingUp className="mb-4 h-8 w-8 text-accent" />
-                  <CardTitle>Built for Real Work</CardTitle>
+                  <TrendingUp className="mb-4 h-8 w-8 text-[#A855F7]" />
+                  <CardTitle className="text-white">Business workflows</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>
-                    From marketing and support to research and operations, our AI employees are trained on real business
-                    workflows so they can start delivering value in days, not months.
+                  <CardDescription className="text-gray-300">
+                    Professional behaviour
                   </CardDescription>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-card border-white/10">
                 <CardHeader>
-                  <CheckCircle2 className="mb-4 h-8 w-8 text-secondary" />
-                  <CardTitle>Consistent &amp; Scalable</CardTitle>
+                  <CheckCircle2 className="mb-4 h-8 w-8 text-[#EC4899]" />
+                  <CardTitle className="text-white">24/7 Availability</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>
-                    No sick days. No burnout. No turnover. Your AI employee works 24/7, stays on-brand, and scales with
-                    your workload automatically.
+                  <CardDescription className="text-gray-300">
+                    It feels like hiring a real team member — only cheaper, faster, and infinitely scalable.
                   </CardDescription>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-card border-white/10">
                 <CardHeader>
-                  <Shield className="mb-4 h-8 w-8 text-primary" />
-                  <CardTitle>Cost-Efficient by Design</CardTitle>
+                  <Shield className="mb-4 h-8 w-8 text-[#2563EB]" />
+                  <CardTitle className="text-white">Cost-Efficient</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>
-                    StaffPilot is designed to cost 80–90% less than hiring humans for the same work — without
-                    compromising on quality, professionalism, or responsiveness.
+                  <CardDescription className="text-gray-300">
+                    Save 80–90% compared to traditional hiring
                   </CardDescription>
                 </CardContent>
               </Card>
             </div>
           </div>
 
-          {/* Built for Western Businesses. Powered Offshore. */}
-          <div className="mb-16 grid gap-10 md:grid-cols-2">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-bold">Built for Western Businesses. Powered Offshore.</h2>
-              <p className="text-muted-foreground">
-                StaffPilot is engineered for Western businesses that demand clear communication, professional standards,
-                and reliable delivery — while leveraging global infrastructure for maximum value.
-              </p>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <Globe2 className="mt-0.5 h-5 w-5 text-primary" />
-                  <span>Exceptional quality and clear, business-ready communication.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Globe2 className="mt-0.5 h-5 w-5 text-primary" />
-                  <span>Competitive pricing powered by offshore optimisation.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Globe2 className="mt-0.5 h-5 w-5 text-primary" />
-                  <span>High-touch service with fast turnaround times.</span>
-                </li>
-              </ul>
-            </div>
+       
 
-            <Card className="h-full">
-              <CardHeader>
-                <HeartHandshake className="mb-4 h-8 w-8 text-accent" />
-                <CardTitle>The Biggest Hiring Arbitrage Opportunity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  Hiring a marketer, support rep, or assistant now costs thousands per month — before benefits, tools,
-                  and training. StaffPilot lets you deploy AI employees that handle the same work for a fraction of the
-                  price, with a setup measured in days, not months.
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </div>
-
-          
+         
 
           {/* CTA: Free Trial + Free Audit */}
-          <div className="rounded-2xl border border-border/50 bg-gradient-to-br from-primary/10 via-accent/10 to-secondary/10 p-8 text-center sm:p-12">
-            <h2 className="mb-4 text-3xl font-bold">Free 7-Day Trial + Free Audit</h2>
-            <p className="mb-8 mx-auto max-w-2xl text-lg text-muted-foreground">
-              Experience AI staffing with no risk. See exactly how much time and money an AI employee can save your
-              business before you commit.
+          <div className="rounded-2xl glass-card border-white/10 bg-gradient-to-br from-[#2563EB]/10 via-[#A855F7]/10 to-[#EC4899]/10 p-8 text-center sm:p-12">
+            <h2 className="mb-4 text-3xl font-bold text-white">Free 7-Day Trial + Free Audit</h2>
+            <p className="mb-8 mx-auto max-w-2xl text-lg text-gray-300">
+              Experience AI staffing with no risk.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button size="lg" className="ai-gradient" asChild>
-                <Link href="/pricing">Start Free Trial</Link>
+              <Button size="lg" className="bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
+                <Link href="/signup">Start Free Trial</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" className="glass-card border-white/20 text-white hover:bg-white/10" asChild>
                 <Link href="/contact">Book Free Audit</Link>
-              </Button>
+            </Button>
             </div>
           </div>
         </div>

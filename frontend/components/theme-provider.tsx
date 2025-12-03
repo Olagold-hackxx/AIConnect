@@ -20,33 +20,20 @@ const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undef
 
 const THEME_STORAGE_KEY = "codian-theme"
 
-export function ThemeProvider({ children, defaultTheme = "dark" }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Initialize from localStorage immediately to prevent flash
-    if (globalThis.window !== undefined) {
-      const stored = globalThis.localStorage.getItem(THEME_STORAGE_KEY) as Theme | null
-      if (stored === "dark" || stored === "light") {
-        // Apply theme immediately before React hydration
-        const root = globalThis.document.documentElement
-        root.classList.remove("light", "dark")
-        root.classList.add(stored)
-        return stored
-      }
-    }
-    return defaultTheme
-  })
-
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  // Always use dark theme, no state management needed
   useEffect(() => {
-    // Apply theme on mount and when it changes
+    // Always apply dark theme
     const root = globalThis.document.documentElement
     root.classList.remove("light", "dark")
-    root.classList.add(theme)
-    
-    // Save to localStorage
-    globalThis.localStorage.setItem(THEME_STORAGE_KEY, theme)
-  }, [theme])
+    root.classList.add("dark")
+  }, [])
 
-  const value = useMemo(() => ({ theme, setTheme }), [theme])
+  // Provide a no-op setTheme function for compatibility
+  const value = useMemo(() => ({ 
+    theme: "dark" as Theme, 
+    setTheme: () => {} // No-op function
+  }), [])
 
   return <ThemeProviderContext.Provider value={value}>{children}</ThemeProviderContext.Provider>
 }
