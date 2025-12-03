@@ -29,88 +29,96 @@ export default function ServicesPage() {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2">
-            <Card className="h-full">
+            <Card className="h-full flex flex-col">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                   <Sparkles className="h-6 w-6 text-primary" />
             </div> 
                 <CardTitle>AI Digital Marketer</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>Handles day-to-day marketing so you can focus on strategy.</p>
-                <ul className="space-y-1">
-                  <li>• Social media posting</li>
-                  <li>• Content creation</li>
-                  <li>• Ad ideas &amp; scripts</li>
-                  <li>• SEO content</li>
-                  <li>• Email marketing</li>
-                </ul>
-                <Button className="mt-4 w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
+              <CardContent className="space-y-3 text-sm text-muted-foreground flex-1 flex flex-col">
+                <div className="flex-1">
+                  <p>Handles day-to-day marketing so you can focus on strategy.</p>
+                  <ul className="space-y-1 mt-3">
+                    <li>• Social media posting</li>
+                    <li>• Content creation</li>
+                    <li>• Ad ideas &amp; scripts</li>
+                    <li>• SEO content</li>
+                    <li>• Email marketing</li>
+                  </ul>
+                </div>
+                <Button className="mt-auto w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
                   <Link href="/pricing">Deploy AI Marketer (7 day Free Trial)</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="h-full">
+            <Card className="h-full flex flex-col">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10">
                   <HeadphonesIcon className="h-6 w-6 text-secondary" />
             </div>
                 <CardTitle>AI Customer Support Agent</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>Delivers friendly, human-like support around the clock.</p>
-                <ul className="space-y-1">
-                  <li>• 24/7 responses</li>
-                  <li>• Human-like conversation</li>
-                  <li>• Ticket handling</li>
-                  <li>• Order updates &amp; customer nurturing</li>
-                  <li>• Complaint resolution</li>
-                </ul>
-                <Button className="mt-4 w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
+              <CardContent className="space-y-3 text-sm text-muted-foreground flex-1 flex flex-col">
+                <div className="flex-1">
+                  <p>Delivers friendly, human-like support around the clock.</p>
+                  <ul className="space-y-1 mt-3">
+                    <li>• 24/7 responses</li>
+                    <li>• Human-like conversation</li>
+                    <li>• Ticket handling</li>
+                    <li>• Order updates &amp; customer nurturing</li>
+                    <li>• Complaint resolution</li>
+                  </ul>
+                </div>
+                <Button className="mt-auto w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
                   <Link href="/pricing">Deploy AI Support Agent (Free Trial)</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="h-full">
+            <Card className="h-full flex flex-col">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
                   <Users className="h-6 w-6 text-accent" />
             </div>
                 <CardTitle>AI Executive Assistant</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>Organised, detail-oriented support for your schedule and ops.</p>
-                <ul className="space-y-1">
-                  <li>• Calendar management</li>
-                  <li>• Email drafting</li>
-                  <li>• Research &amp; reminders</li>
-                  <li>• Document creation</li>
-                  <li>• Task management</li>
-                </ul>
-                <Button className="mt-4 w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
+              <CardContent className="space-y-3 text-sm text-muted-foreground flex-1 flex flex-col">
+                <div className="flex-1">
+                  <p>Organised, detail-oriented support for your schedule and ops.</p>
+                  <ul className="space-y-1 mt-3">
+                    <li>• Calendar management</li>
+                    <li>• Email drafting</li>
+                    <li>• Research &amp; reminders</li>
+                    <li>• Document creation</li>
+                    <li>• Task management</li>
+                  </ul>
+                </div>
+                <Button className="mt-auto w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
                   <Link href="/pricing">Deploy AI Executive Assistant (Free Trial)</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="h-full">
+            <Card className="h-full flex flex-col">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                   <Target className="h-6 w-6 text-primary" />
                 </div>
                 <CardTitle>AI Business Development Rep</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>Confident, professional outreach that keeps your pipeline full.</p>
-                <ul className="space-y-1">
-                  <li>• Lead generation</li>
-                  <li>• Personalised outreach</li>
-                  <li>• Follow-ups &amp; pipeline management</li>
-                  <li>• Sales call prep</li>
-                </ul>
-                <Button className="mt-4 w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
+              <CardContent className="space-y-3 text-sm text-muted-foreground flex-1 flex flex-col">
+                <div className="flex-1">
+                  <p>Confident, professional outreach that keeps your pipeline full.</p>
+                  <ul className="space-y-1 mt-3">
+                    <li>• Lead generation</li>
+                    <li>• Personalised outreach</li>
+                    <li>• Follow-ups &amp; pipeline management</li>
+                    <li>• Sales call prep</li>
+                  </ul>
+                </div>
+                <Button className="mt-auto w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
                   <Link href="/pricing">Deploy AI Business Development Rep (Free Trial)</Link>
                 </Button>
               </CardContent>
@@ -121,41 +129,45 @@ export default function ServicesPage() {
         {/* Custom AI & Free Audit */}
         <div className="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-2">
-            <Card className="h-full">
+            <Card className="h-full flex flex-col">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                   <Sparkles className="h-6 w-6 text-primary" />
             </div>
                 <CardTitle>Custom AI Employees</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>
-                  Have a unique need? We'll build a custom AI worker trained specifically for your workflow.
-                </p>
-                <Button className="mt-4 w-full bg-[#A855F7] hover:bg-[#8b5cf6] text-white neon-glow-purple" asChild>
+              <CardContent className="space-y-3 text-sm text-muted-foreground flex-1 flex flex-col">
+                <div className="flex-1">
+                  <p>
+                    Have a unique need? We'll build a custom AI worker trained specifically for your workflow.
+                  </p>
+                </div>
+                <Button className="mt-auto w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
                   <Link href="/contact">Build a Custom AI Employee</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="h-full">
+            <Card className="h-full flex flex-col">
               <CardHeader>
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10">
                   <CheckCircle2 className="h-6 w-6 text-secondary" />
             </div>
                 <CardTitle>Free Business Efficiency Audit</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>
-                  Not sure which AI employee you need? Get a free business audit to identify your best role, biggest savings, and highest-impact workflows.
-                </p>
-                <ul className="space-y-1">
-                  <li>✓ Efficiency score</li>
-                  <li>✓ Savings estimate</li>
-                  <li>✓ Role recommendation</li>
-                  <li>✓ Workflow suggestions</li>
-                </ul>
-                <Button className="mt-4 w-full bg-[#EC4899] hover:bg-[#be185d] text-white neon-glow-fuchsia" asChild>
+              <CardContent className="space-y-3 text-sm text-muted-foreground flex-1 flex flex-col">
+                <div className="flex-1">
+                  <p>
+                    Not sure which AI employee you need? Get a free business audit to identify your best role, biggest savings, and highest-impact workflows.
+                  </p>
+                  <ul className="space-y-1 mt-3">
+                    <li>✓ Efficiency score</li>
+                    <li>✓ Savings estimate</li>
+                    <li>✓ Role recommendation</li>
+                    <li>✓ Workflow suggestions</li>
+                  </ul>
+                </div>
+                <Button className="mt-auto w-full bg-[#2563EB] hover:bg-[#1d4ed8] text-white neon-glow-blue" asChild>
                   <Link href="/contact">Book Free Audit</Link>
                 </Button>
               </CardContent>
